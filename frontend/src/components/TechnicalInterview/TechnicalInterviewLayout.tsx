@@ -4,6 +4,8 @@ import { TechnicalToolbar } from "./TechnicalToolbar";
 import { TechnicalPromptCard } from "./TechnicalPromptCard";
 import { TechnicalChatPanel } from "./TechnicalChatPanel";
 import { TechnicalCodeEditor } from "./TechnicalCodeEditor";
+import { useInterview } from "../../hooks/useInterview";
+import type { InterviewConfig, InterviewMode } from "../../types/interview";
 
 const MOCK_PROMPT = {
   title: "Two Sum",
@@ -29,56 +31,80 @@ const MOCK_PROMPT = {
   ],
 };
 
-const MOCK_TRANSCRIPT = [
-  {
-    speaker: "AI" as const,
-    text: "Welcome! Let's start with a classic problem. Take a moment to read the prompt, then walk me through your initial approach before you start coding.",
-  },
-  {
-    speaker: "You" as const,
-    text: "Sure — my first instinct is to use a hash map to store each number's index as I iterate, so I can check in O(1) whether the complement exists.",
-  },
-  {
-    speaker: "AI" as const,
-    text: "Good thinking. What's the time and space complexity of that approach?",
-  },
-];
-
 export function TechnicalInterviewLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [time, setTime] = useState(0);
-  const [isAISpeaking, setIsAISpeaking] = useState(false);
+  const {
+    messages,
+    isLoading,
+    status,
+    result,
+    error,
+    startInterview,
+    sendAnswer,
+  } = useInterview();
 
   // Pick up config passed from SetupDashboard via router state
   const state = location.state as {
     role?: string;
     questionType?: string;
     difficulty?: number;
+    strictness?: number;
+    experienceLevel?: number;
+    interviewer?: string;
   } | null;
 
-  const role = state?.role ?? "Frontend Engineer Intern";
-  const mode = (state?.questionType === "hybrid" ? "hybrid" : "technical") as "technical" | "hybrid";
+  const role = state?.role ?? "frontend";
+  const mode = (state?.questionType === "hybrid" ? "hybrid" : "technical") as InterviewMode;
+  const difficultyValue = state?.difficulty ?? 50;
   const difficultyLabel = (() => {
-    const d = state?.difficulty ?? 50;
-    if (d < 34) return "Easy";
-    if (d < 67) return "Medium";
+    if (difficultyValue < 34) return "Easy";
+    if (difficultyValue < 67) return "Medium";
     return "Hard";
   })();
+
+  // Start interview on mount
+  useEffect(() => {
+    const config: InterviewConfig = {
+      mode,
+      questionType: mode,
+      role,
+      difficulty: difficultyValue,
+      strictness: state?.strictness ?? 50,
+      experienceLevel: state?.experienceLevel ?? 2,
+      interviewer: state?.interviewer ?? "Cassidy",
+    };
+    startInterview(config);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const timer = setInterval(() => setTime((t) => t + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // Navigate to analytics when finished
   useEffect(() => {
-    // Simulate AI speaking pulse
-    const interval = setInterval(() => setIsAISpeaking((prev) => !prev), 3000);
-    return () => clearInterval(interval);
-  }, []);
+    if (status === "finished" && result) {
+      navigate("/analytics", { state: { result } });
+    }
+  }, [status, result, navigate]);
+
+  // Map messages to transcript format for chat panel
+  const transcript = messages.map((m) => ({
+    speaker: (m.role === "assistant" ? "AI" : "You") as "AI" | "You",
+    text: m.content,
+  }));
 
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col p-4 overflow-hidden">
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-2 p-2 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 text-xs">
+          {error}
+        </div>
+      )}
+
       {/* Toolbar */}
       <TechnicalToolbar
         role={role}
@@ -86,8 +112,8 @@ export function TechnicalInterviewLayout() {
         questionNumber={1}
         totalQuestions={3}
         time={time}
-        mode={mode}
-        onEnd={() => navigate("/analytics")}
+        mode={mode === "hybrid" ? "hybrid" : "technical"}
+        onEnd={() => navigate("/analytics", { state: { result } })}
       />
 
       {/* Split Layout */}
@@ -101,8 +127,10 @@ export function TechnicalInterviewLayout() {
           />
           <div className="flex-1 min-h-0">
             <TechnicalChatPanel
-              transcript={MOCK_TRANSCRIPT}
-              isAISpeaking={isAISpeaking}
+              transcript={transcript}
+              isAISpeaking={isLoading}
+              isLoading={isLoading}
+              onSendAnswer={sendAnswer}
             />
           </div>
         </div>

@@ -1,70 +1,63 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { motion } from "motion/react";
-import { Mic, MicOff, RotateCcw, X } from "lucide-react";
-
-// TODO 1: Replace mock state with useInterview hook once wired up
-// import { useInterview } from "../hooks/useInterview";
-
-// TODO 2: Add MediaRecorder ref to capture mic audio for Whisper STT
-// const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-// const audioChunksRef = useRef<Blob[]>([]);
-
-// TODO 3: On mount, call startInterview() and speak the first question via Web Speech API
-// useEffect(() => {
-//   async function init() {
-//     const { question } = await startInterview(config); // config from router location.state
-//     setTranscript([{ speaker: "AI", text: question }]);
-//     speakQuestion(question);  // window.speechSynthesis
-//   }
-//   init();
-// }, []);
-
-// TODO 4: Implement startRecording / stopRecording using MediaRecorder API
-// async function startRecording() {
-//   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-//   mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: "audio/webm" });
-//   audioChunksRef.current = [];
-//   mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
-//   mediaRecorderRef.current.onstop = async () => {
-//     const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-//     await recordAndTranscribe(blob);  // from useInterview hook
-//   };
-//   mediaRecorderRef.current.start();
-//   setIsUserSpeaking(true);
-// }
-// function stopRecording() {
-//   mediaRecorderRef.current?.stop();
-//   setIsUserSpeaking(false);
-// }
-
-// TODO 5: Wire mute button to actually mute the MediaRecorder stream tracks
-// TODO 6: Wire reset button to restart the interview (call startInterview again)
+import { RotateCcw, X, Send } from "lucide-react";
+import { useInterview } from "../hooks/useInterview";
+import type { InterviewConfig } from "../types/interview";
 
 export function LiveInterview() {
   const navigate = useNavigate();
-  const [isMuted, setIsMuted] = useState(false);
-  const [isAISpeaking, setIsAISpeaking] = useState(false);
-  const [isUserSpeaking, setIsUserSpeaking] = useState(false);
+  const location = useLocation();
   const [time, setTime] = useState(0);
-  const [transcript, setTranscript] = useState([
-    { speaker: "AI", text: "Hello! I'm excited to interview you today for the Backend Engineer position. Let's start with a simple question: Can you tell me about your experience with database design and optimization?" },
-  ]);
+  const [typedInput, setTypedInput] = useState("");
 
+  const {
+    messages,
+    isLoading,
+    status,
+    result,
+    error,
+    startInterview,
+    sendAnswer,
+    resetInterview,
+  } = useInterview();
+
+  // Build config from router state
+  const state = location.state as {
+    role?: string;
+    questionType?: string;
+    difficulty?: number;
+    strictness?: number;
+    experienceLevel?: number;
+    interviewer?: string;
+  } | null;
+
+  // Start interview on mount
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTime((t) => t + 1);
-    }, 1000);
+    const config: InterviewConfig = {
+      mode: "behavioral",
+      questionType: "behavioral",
+      role: state?.role ?? "backend",
+      difficulty: state?.difficulty ?? 50,
+      strictness: state?.strictness ?? 50,
+      experienceLevel: state?.experienceLevel ?? 2,
+      interviewer: state?.interviewer ?? "Cassidy",
+    };
+    startInterview(config);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Timer
+  useEffect(() => {
+    const timer = setInterval(() => setTime((t) => t + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // Navigate to analytics when finished
   useEffect(() => {
-    // Simulate AI speaking animation
-    const interval = setInterval(() => {
-      setIsAISpeaking((prev) => !prev);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+    if (status === "finished" && result) {
+      navigate("/analytics", { state: { result } });
+    }
+  }, [status, result, navigate]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -72,9 +65,21 @@ export function LiveInterview() {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleEndInterview = () => {
-    navigate("/analytics");
+  const handleSend = () => {
+    if (!typedInput.trim() || isLoading) return;
+    sendAnswer(typedInput);
+    setTypedInput("");
   };
+
+  const handleEndInterview = () => {
+    navigate("/analytics", { state: { result } });
+  };
+
+  // Map messages to transcript format
+  const transcript = messages.map((m) => ({
+    speaker: m.role === "assistant" ? "AI" : "You",
+    text: m.content,
+  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-6">
@@ -82,11 +87,18 @@ export function LiveInterview() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold">Backend Engineer Interview</h1>
-            <p className="text-gray-400">Technical Assessment</p>
+            <h1 className="text-2xl font-bold">{(state?.role ?? "Backend").charAt(0).toUpperCase() + (state?.role ?? "backend").slice(1)} Engineer Interview</h1>
+            <p className="text-gray-400">Behavioral Assessment</p>
           </div>
           <div className="text-3xl font-mono">{formatTime(time)}</div>
         </div>
+
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Main Interview Area */}
         <div className="grid lg:grid-cols-2 gap-6 mb-6">
@@ -99,25 +111,9 @@ export function LiveInterview() {
             <h3 className="text-sm font-medium text-gray-400 mb-4">Interviewer</h3>
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
-                <motion.div
-                  animate={{
-                    scale: isAISpeaking ? [1, 1.05, 1] : 1,
-                  }}
-                  transition={{ duration: 0.5 }}
-                  className="w-40 h-40 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center relative"
-                >
+                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
                   <span className="text-6xl font-bold text-white">C</span>
-                  {isAISpeaking && (
-                    <motion.div
-                      className="absolute inset-0 rounded-full border-4 border-purple-400"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 0, 0.5],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
-                </motion.div>
+                </div>
               </div>
               <h4 className="text-xl font-bold">Cassidy</h4>
               <p className="text-sm text-gray-400">Senior Technical Interviewer</p>
@@ -134,30 +130,11 @@ export function LiveInterview() {
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
                 <div className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center">
-                  <Mic className="w-16 h-16 text-white" />
+                  <span className="text-6xl font-bold text-white">U</span>
                 </div>
               </div>
               <div className="w-full h-20 bg-gray-800/50 rounded-xl flex items-center justify-center">
-                {isUserSpeaking ? (
-                  <motion.div className="flex gap-1">
-                    {[...Array(20)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="w-1 bg-cyan-400 rounded-full"
-                        animate={{
-                          height: [10, Math.random() * 40 + 20, 10],
-                        }}
-                        transition={{
-                          duration: 0.5,
-                          repeat: Infinity,
-                          delay: i * 0.05,
-                        }}
-                      />
-                    ))}
-                  </motion.div>
-                ) : (
-                  <p className="text-gray-500">Speak to respond...</p>
-                )}
+                <p className="text-gray-500">Type your response below...</p>
               </div>
             </div>
           </motion.div>
@@ -171,6 +148,9 @@ export function LiveInterview() {
         >
           <h3 className="text-sm font-medium text-gray-400 mb-4">Live Transcript</h3>
           <div className="space-y-4 max-h-64 overflow-y-auto">
+            {transcript.length === 0 && isLoading && (
+              <p className="text-gray-500">Loading first question...</p>
+            )}
             {transcript.map((entry, index) => (
               <div key={index} className="flex gap-3">
                 <span className={`font-semibold ${entry.speaker === "AI" ? "text-purple-400" : "text-cyan-400"}`}>
@@ -179,25 +159,46 @@ export function LiveInterview() {
                 <p className="text-gray-300">{entry.text}</p>
               </div>
             ))}
+            {isLoading && transcript.length > 0 && (
+              <div className="flex gap-3">
+                <span className="font-semibold text-purple-400">AI:</span>
+                <p className="text-gray-500 animate-pulse">Thinking...</p>
+              </div>
+            )}
           </div>
         </motion.div>
+
+        {/* Text Input */}
+        <div className="mb-6 flex gap-3">
+          <input
+            type="text"
+            value={typedInput}
+            onChange={(e) => setTypedInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Type your answer..."
+            disabled={isLoading || status !== "running"}
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
+          />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSend}
+            disabled={isLoading || !typedInput.trim()}
+            className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Send className="w-5 h-5" />
+          </motion.button>
+        </div>
 
         {/* Controls */}
         <div className="flex justify-center gap-4">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setIsMuted(!isMuted)}
-            className={`p-4 rounded-full ${
-              isMuted ? "bg-red-500" : "bg-white/10"
-            } backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all`}
-          >
-            {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              resetInterview();
+              setTime(0);
+            }}
             className="p-4 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all"
           >
             <RotateCcw className="w-6 h-6" />

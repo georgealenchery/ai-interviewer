@@ -1,60 +1,103 @@
-import { useState } from "react";
-import type { Message } from "../types/interview";
-
-// TODO 1: Import api functions once implemented
-// import { startInterview, nextStep, transcribeAudio } from "../services/api";
+import { useState, useCallback } from "react";
+import type { Message, InterviewConfig, EvaluationResult, InterviewStatus } from "../types/interview";
+import { startInterview as apiStart, nextStep as apiNext } from "../services/api";
 
 export function useInterview() {
-  const [messages, _setMessages] = useState<Message[]>([]);
-  const [question, _setQuestion] = useState<string>("");
-  const [isLoading, _setIsLoading] = useState(false);
-  const [step, _setStep] = useState(0);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [question, setQuestion] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState(0);
+  const [config, setConfig] = useState<InterviewConfig | null>(null);
+  const [status, setStatus] = useState<InterviewStatus>("idle");
+  const [result, setResult] = useState<EvaluationResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // TODO 2: Wire up startInterview — call on mount or when user clicks "Start Interview"
-  // async function start(config: InterviewConfig) {
-  //   setIsLoading(true);
-  //   const { question } = await startInterview(config);
-  //   setQuestion(question);
-  //   setMessages([{ id: crypto.randomUUID(), role: "assistant", content: question, timestamp: new Date() }]);
-  //   setIsLoading(false);
-  // }
+  const startInterview = useCallback(async (interviewConfig: InterviewConfig) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setConfig(interviewConfig);
+      const data = await apiStart(interviewConfig);
+      const aiMsg: Message = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: data.question,
+        timestamp: new Date(),
+      };
+      setMessages([aiMsg]);
+      setQuestion(data.question);
+      setStep(data.step);
+      setStatus("running");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start interview");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  // TODO 3: Wire up sendAnswer — append user message, call nextStep, append AI response
-  function sendAnswer(answer: string) {
-    // TODO 3a: Append user message to messages
-    // const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: answer, timestamp: new Date() };
-    // setMessages((prev) => [...prev, userMsg]);
+  const sendAnswer = useCallback(async (text: string) => {
+    if (!config || !text.trim()) return;
 
-    // TODO 3b: Call nextStep with full messages array + current step
-    // setIsLoading(true);
-    // const result = await nextStep([...messages, userMsg], step + 1);
-    // setStep((s) => s + 1);
+    const userMsg: Message = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: text,
+      timestamp: new Date(),
+    };
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
 
-    // TODO 3c: If done, navigate to /analytics with feedback in router state
-    // if (result.done) { navigate("/analytics", { state: result.feedback }); return; }
+    try {
+      setIsLoading(true);
+      setError(null);
 
-    // TODO 3d: Append AI follow-up to messages and update question
-    // const aiMsg: Message = { id: crypto.randomUUID(), role: "assistant", content: result.question, timestamp: new Date() };
-    // setMessages((prev) => [...prev, aiMsg]);
-    // setQuestion(result.question);
-    // setIsLoading(false);
+      // Strip id/timestamp for backend
+      const backendMessages = updatedMessages.map(({ role, content }) => ({ role, content }));
+      const data = await apiNext(backendMessages, step + 1, config);
 
-    console.log("sendAnswer:", answer);
-  }
+      if (data.done) {
+        setResult(data.result);
+        setStatus("finished");
+      } else {
+        const aiMsg: Message = {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: data.question,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, aiMsg]);
+        setQuestion(data.question);
+        setStep(data.step);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send answer");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [config, messages, step]);
 
-  // TODO 4: Add recordAndTranscribe() to capture mic audio, send to Whisper, then call sendAnswer
-  // async function recordAndTranscribe(audioBlob: Blob) {
-  //   const transcript = await transcribeAudio(audioBlob);
-  //   await sendAnswer(transcript);
-  // }
+  const resetInterview = useCallback(() => {
+    setMessages([]);
+    setQuestion("");
+    setStep(0);
+    setConfig(null);
+    setStatus("idle");
+    setResult(null);
+    setError(null);
+    setIsLoading(false);
+  }, []);
 
-  // TODO 5: Add Web Speech API TTS to speak the AI question aloud
-  // function speakQuestion(text: string) {
-  //   const utterance = new SpeechSynthesisUtterance(text);
-  //   utterance.rate = 0.95;
-  //   utterance.pitch = 1;
-  //   window.speechSynthesis.speak(utterance);
-  // }
-
-  return { messages, question, isLoading, step, sendAnswer };
+  return {
+    messages,
+    question,
+    isLoading,
+    step,
+    config,
+    status,
+    result,
+    error,
+    startInterview,
+    sendAnswer,
+    resetInterview,
+  };
 }

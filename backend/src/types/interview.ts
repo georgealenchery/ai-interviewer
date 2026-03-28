@@ -42,10 +42,6 @@ export type EvaluationResult = {
   nextSteps: string[];
 };
 
-export type TranscribeResult = {
-  text: string;
-};
-
 export type ApiErrorResponse = {
   error: string;
   details?: string;

@@ -10,7 +10,7 @@ const MAX_BEHAVIORAL_STEPS = 5;
 const MAX_TECHNICAL_STEPS = 3;
 
 function getPhase(
-  mode: InterviewConfig["questionType"],
+  mode: InterviewConfig["mode"],
   step: number,
 ): "behavioral" | "technical" {
   if (mode === "behavioral") return "behavioral";
@@ -19,7 +19,7 @@ function getPhase(
   return step < MAX_BEHAVIORAL_STEPS ? "behavioral" : "technical";
 }
 
-function getMaxSteps(mode: InterviewConfig["questionType"]): number {
+function getMaxSteps(mode: InterviewConfig["mode"]): number {
   if (mode === "behavioral") return MAX_BEHAVIORAL_STEPS;
   if (mode === "technical") return MAX_TECHNICAL_STEPS;
   // Hybrid: behavioral steps + technical steps
@@ -33,12 +33,12 @@ export async function startInterview(
   config: InterviewConfig,
 ): Promise<InterviewStartResult> {
   const question = await generateFirstQuestion(config);
-  const phase = getPhase(config.questionType, 0);
+  const phase = getPhase(config.mode, 0);
 
   return {
     question,
     step: 0,
-    mode: config.questionType,
+    mode: config.mode,
     phase,
   };
 }
@@ -48,11 +48,11 @@ export async function startInterview(
  */
 export async function nextStep(input: InterviewStepInput): Promise<InterviewNextResult> {
   const { messages, step, config } = input;
-  const maxSteps = getMaxSteps(config.questionType);
+  const maxSteps = getMaxSteps(config.mode);
 
   if (step < maxSteps) {
     const question = await generateFollowUp(messages, config);
-    const phase = getPhase(config.questionType, step + 1);
+    const phase = getPhase(config.mode, step + 1);
 
     return {
       done: false,

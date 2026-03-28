@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { motion } from "motion/react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, MessageSquare, Code, Lightbulb, ArrowLeft } from "lucide-react";
+import type { EvaluationResult } from "../types/interview";
 
 const performanceData = [
   { date: "Jan 15", score: 65 },
@@ -10,18 +11,48 @@ const performanceData = [
   { date: "Feb 19", score: 75 },
   { date: "Mar 4", score: 78 },
   { date: "Mar 18", score: 82 },
-  { date: "Mar 28", score: 82 },
 ];
 
 const pastInterviews = [
-  { date: "Mar 28, 2026", role: "Backend Engineer", score: 82, type: "Technical" },
   { date: "Mar 18, 2026", role: "Full-Stack", score: 78, type: "Hybrid" },
   { date: "Mar 4, 2026", role: "Backend Engineer", score: 75, type: "Behavioral" },
   { date: "Feb 19, 2026", role: "Backend Engineer", score: 68, type: "Technical" },
 ];
 
+// Fallback when no result is passed via router state
+const DEFAULT_RESULT: EvaluationResult = {
+  score: 82,
+  communication: 75,
+  technicalAccuracy: 78,
+  problemSolving: 83,
+  strengths: [
+    "Clear and structured communication style",
+    "Strong understanding of database optimization",
+    "Good time management during responses",
+  ],
+  improvements: [
+    "Consider more edge cases in solutions",
+    "Practice explaining time complexity analysis",
+    "Reduce usage of filler words",
+  ],
+  nextSteps: [
+    "Practice system design interviews",
+    "Review distributed systems concepts",
+    "Try harder difficulty questions",
+  ],
+};
+
 export function AnalyticsDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const state = location.state as { result?: EvaluationResult } | null;
+  const result = state?.result ?? DEFAULT_RESULT;
+
+  // Add current score to chart if we have a live result
+  const chartData = state?.result
+    ? [...performanceData, { date: "Now", score: result.score }]
+    : [...performanceData, { date: "Mar 28", score: 82 }];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-6">
@@ -54,13 +85,13 @@ export function AnalyticsDashboard() {
             <div>
               <h2 className="text-gray-600 mb-2">Latest Interview Score</h2>
               <div className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                82%
+                {result.score}%
               </div>
-              <p className="text-gray-600 mt-2">Backend Engineer • Technical Interview</p>
+              <p className="text-gray-600 mt-2">Interview Complete</p>
             </div>
             <div className="flex items-center gap-2 text-green-600">
               <TrendingUp className="w-8 h-8" />
-              <span className="text-2xl font-bold">+4%</span>
+              <span className="text-2xl font-bold">+{Math.max(0, result.score - 78)}%</span>
             </div>
           </div>
         </motion.div>
@@ -83,15 +114,12 @@ export function AnalyticsDashboard() {
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-gray-600">Clarity</span>
-                  <span className="text-sm font-semibold">85%</span>
+                  <span className="text-sm font-semibold">{result.communication}%</span>
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style={{ width: "85%" }} />
+                  <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style={{ width: `${result.communication}%` }} />
                 </div>
               </div>
-              <p className="text-sm text-gray-600">
-                Strong articulation with minimal filler words. Consider pausing before answering.
-              </p>
             </div>
           </motion.div>
 
@@ -111,15 +139,12 @@ export function AnalyticsDashboard() {
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-gray-600">Correctness</span>
-                  <span className="text-sm font-semibold">78%</span>
+                  <span className="text-sm font-semibold">{result.technicalAccuracy}%</span>
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style={{ width: "78%" }} />
+                  <div className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style={{ width: `${result.technicalAccuracy}%` }} />
                 </div>
               </div>
-              <p className="text-sm text-gray-600">
-                Good understanding of concepts. Review edge cases and time complexity analysis.
-              </p>
             </div>
           </motion.div>
 
@@ -139,15 +164,12 @@ export function AnalyticsDashboard() {
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-gray-600">Approach</span>
-                  <span className="text-sm font-semibold">83%</span>
+                  <span className="text-sm font-semibold">{result.problemSolving}%</span>
                 </div>
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-pink-400 to-pink-600 rounded-full" style={{ width: "83%" }} />
+                  <div className="h-full bg-gradient-to-r from-pink-400 to-pink-600 rounded-full" style={{ width: `${result.problemSolving}%` }} />
                 </div>
               </div>
-              <p className="text-sm text-gray-600">
-                Excellent systematic thinking. Break down problems before coding to save time.
-              </p>
             </div>
           </motion.div>
         </div>
@@ -161,7 +183,7 @@ export function AnalyticsDashboard() {
         >
           <h3 className="font-semibold text-gray-900 mb-6">Improvement Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={performanceData}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="date" stroke="#6b7280" />
               <YAxis stroke="#6b7280" domain={[0, 100]} />
@@ -213,7 +235,7 @@ export function AnalyticsDashboard() {
             </div>
           </motion.div>
 
-          {/* AI Feedback Summary */}
+          {/* AI Feedback Summary — dynamic from result */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -228,9 +250,9 @@ export function AnalyticsDashboard() {
                   Strengths
                 </h4>
                 <ul className="space-y-1 text-sm text-gray-700 ml-4">
-                  <li>• Clear and structured communication style</li>
-                  <li>• Strong understanding of database optimization</li>
-                  <li>• Good time management during responses</li>
+                  {result.strengths.map((s, i) => (
+                    <li key={i}>• {s}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -240,9 +262,9 @@ export function AnalyticsDashboard() {
                   Areas for Improvement
                 </h4>
                 <ul className="space-y-1 text-sm text-gray-700 ml-4">
-                  <li>• Consider more edge cases in solutions</li>
-                  <li>• Practice explaining time complexity analysis</li>
-                  <li>• Reduce usage of filler words ("um", "like")</li>
+                  {result.improvements.map((s, i) => (
+                    <li key={i}>• {s}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -252,9 +274,9 @@ export function AnalyticsDashboard() {
                   Suggested Next Steps
                 </h4>
                 <ul className="space-y-1 text-sm text-gray-700 ml-4">
-                  <li>• Practice system design interviews</li>
-                  <li>• Review distributed systems concepts</li>
-                  <li>• Try harder difficulty questions</li>
+                  {result.nextSteps.map((s, i) => (
+                    <li key={i}>• {s}</li>
+                  ))}
                 </ul>
               </div>
             </div>
