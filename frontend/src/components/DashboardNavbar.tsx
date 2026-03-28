@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Bell, ChevronDown, User, Settings, FileText, LogOut } from "lucide-react";
 import { useNavigate } from "react-router";
-// @ts-ignore: allow importing image asset without a module declaration
-import logo from "../../assets/finallogoace.png";
+import logo from "../assets/finallogoace.png";
+
 interface DashboardNavbarProps {
   userName?: string;
   userInitials?: string;
@@ -113,51 +113,34 @@ export function DashboardNavbar({
                     className="absolute right-0 mt-2 w-56 backdrop-blur-xl bg-white/80 border border-white/60 rounded-2xl shadow-lg overflow-hidden"
                   >
                     <div className="py-2">
-                      {/* View Profile */}
                       <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          navigate("/profile");
-                        }}
+                        onClick={() => { setIsDropdownOpen(false); navigate("/profile"); }}
                         className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50/50 transition-all"
                       >
                         <User className="w-4 h-4" />
                         <span className="font-medium">View Profile</span>
                       </button>
 
-                      {/* Settings */}
                       <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          navigate("/settings");
-                        }}
+                        onClick={() => { setIsDropdownOpen(false); navigate("/settings"); }}
                         className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50/50 transition-all"
                       >
                         <Settings className="w-4 h-4" />
                         <span className="font-medium">Settings</span>
                       </button>
 
-                      {/* Past Interviews */}
                       <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          navigate("/analytics");
-                        }}
+                        onClick={() => { setIsDropdownOpen(false); navigate("/analytics"); }}
                         className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50/50 transition-all"
                       >
                         <FileText className="w-4 h-4" />
                         <span className="font-medium">Past Interviews</span>
                       </button>
 
-                      {/* Divider */}
                       <div className="my-2 border-t border-gray-200/50" />
 
-                      {/* Sign Out */}
                       <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          navigate("/");
-                        }}
+                        onClick={() => { setIsDropdownOpen(false); navigate("/"); }}
                         className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50/50 transition-all"
                       >
                         <LogOut className="w-4 h-4" />

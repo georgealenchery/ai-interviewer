@@ -171,15 +171,15 @@ export function SetupDashboard() {
 
               {/* Avatar */}
               <div className="flex justify-center mb-6">
-                <div className={`w-32 h-32 rounded-full bg-gradient-to-br ${interviewerAvatars[selectedInterviewer].color} flex items-center justify-center shadow-lg`}>
+                <div className={`w-32 h-32 rounded-full bg-gradient-to-br ${interviewerAvatars[selectedInterviewer]!.color} flex items-center justify-center shadow-lg`}>
                   <span className="text-4xl font-bold text-white">
-                    {interviewerAvatars[selectedInterviewer].name[0]}
+                    {interviewerAvatars[selectedInterviewer]!.name[0]}
                   </span>
                 </div>
               </div>
 
               <h4 className="text-2xl font-bold text-center text-gray-900 mb-6">
-                {interviewerAvatars[selectedInterviewer].name}
+                {interviewerAvatars[selectedInterviewer]!.name}
               </h4>
 
               {/* Interviewer Selection */}
