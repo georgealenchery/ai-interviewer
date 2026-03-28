@@ -43,7 +43,7 @@ export function DashboardNavbar({
         <div className="flex items-center justify-between">
           {/* Left Side - Logo */}
           <div className="flex items-center">
-            <img src={logo} alt="ACE.AI logo" className="h-8 w-auto" />
+            <img src={logo} alt="ACE.AI logo" className="h-12 w-auto" />
           </div>
 
           {/* Center - Navigation Links */}

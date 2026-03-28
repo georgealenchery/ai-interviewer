@@ -3,6 +3,44 @@ import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { Mic, MicOff, RotateCcw, X } from "lucide-react";
 
+// TODO 1: Replace mock state with useInterview hook once wired up
+// import { useInterview } from "../hooks/useInterview";
+
+// TODO 2: Add MediaRecorder ref to capture mic audio for Whisper STT
+// const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+// const audioChunksRef = useRef<Blob[]>([]);
+
+// TODO 3: On mount, call startInterview() and speak the first question via Web Speech API
+// useEffect(() => {
+//   async function init() {
+//     const { question } = await startInterview(config); // config from router location.state
+//     setTranscript([{ speaker: "AI", text: question }]);
+//     speakQuestion(question);  // window.speechSynthesis
+//   }
+//   init();
+// }, []);
+
+// TODO 4: Implement startRecording / stopRecording using MediaRecorder API
+// async function startRecording() {
+//   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+//   mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: "audio/webm" });
+//   audioChunksRef.current = [];
+//   mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+//   mediaRecorderRef.current.onstop = async () => {
+//     const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+//     await recordAndTranscribe(blob);  // from useInterview hook
+//   };
+//   mediaRecorderRef.current.start();
+//   setIsUserSpeaking(true);
+// }
+// function stopRecording() {
+//   mediaRecorderRef.current?.stop();
+//   setIsUserSpeaking(false);
+// }
+
+// TODO 5: Wire mute button to actually mute the MediaRecorder stream tracks
+// TODO 6: Wire reset button to restart the interview (call startInterview again)
+
 export function LiveInterview() {
   const navigate = useNavigate();
   const [isMuted, setIsMuted] = useState(false);
