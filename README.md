@@ -18,18 +18,18 @@ Quick Performance and Fast, Real Time Experience: Low latency conversation with 
 
 Tech Stack
 Frontend:
-Next.js
 React
 Tailwind CSS
-ElevenLabs React SDK
+VAPI Voice API
 
 Backend:
 Node.js
 Express
 OpenAI API
 
+
 APIs
-ElevenLabs (voice, text-to-speech)
+VAPI (Voice agent, text to speech)
 OpenAI (evaluation and feedback)
 
 Setup Instructions
