@@ -1,51 +1,33 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
+import { motion } from "motion/react";
+import { Mic } from "lucide-react";
 import { TechnicalToolbar } from "./TechnicalToolbar";
 import { TechnicalPromptCard } from "./TechnicalPromptCard";
 import { TechnicalChatPanel } from "./TechnicalChatPanel";
 import { TechnicalCodeEditor } from "./TechnicalCodeEditor";
-import { useInterview } from "../../hooks/useInterview";
-import type { InterviewConfig, InterviewMode } from "../../types/interview";
-
-const MOCK_PROMPT = {
-  title: "Two Sum",
-  difficulty: "Medium" as const,
-  description:
-    "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.",
-  examples: [
-    {
-      input: "nums = [2,7,11,15], target = 9",
-      output: "[0,1]",
-      explanation: "Because nums[0] + nums[1] == 9, we return [0, 1].",
-    },
-    {
-      input: "nums = [3,2,4], target = 6",
-      output: "[1,2]",
-    },
-  ],
-  constraints: [
-    "2 ≤ nums.length ≤ 10⁴",
-    "-10⁹ ≤ nums[i] ≤ 10⁹",
-    "-10⁹ ≤ target ≤ 10⁹",
-    "Only one valid answer exists.",
-  ],
-};
+import { useVapiTechnicalInterview } from "../../hooks/useVapiTechnicalInterview";
+import type { VapiTechnicalConfig } from "../../hooks/useVapiTechnicalInterview";
+import { getRandomProblem } from "../../data/technicalProblems";
+import type { TechnicalProblem } from "../../data/technicalProblems";
 
 export function TechnicalInterviewLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [time, setTime] = useState(0);
-  const {
-    messages,
-    isLoading,
-    status,
-    result,
-    error,
-    startInterview,
-    sendAnswer,
-  } = useInterview();
 
-  // Pick up config passed from SetupDashboard via router state
+  const {
+    status,
+    isSpeaking,
+    isListening,
+    messages,
+    isAnalyzing,
+    callEndedNaturally,
+    start,
+    stop,
+    evaluateTranscript,
+  } = useVapiTechnicalInterview();
+
   const state = location.state as {
     role?: string;
     questionType?: string;
@@ -56,64 +38,111 @@ export function TechnicalInterviewLayout() {
   } | null;
 
   const role = state?.role ?? "frontend";
-  const mode = (state?.questionType === "hybrid" ? "hybrid" : "technical") as InterviewMode;
+  const mode = state?.questionType === "hybrid" ? "hybrid" : "technical";
   const difficultyValue = state?.difficulty ?? 50;
-  const difficultyLabel = (() => {
-    if (difficultyValue < 34) return "Easy";
-    if (difficultyValue < 67) return "Medium";
-    return "Hard";
-  })();
+  const difficultyLabel = difficultyValue <= 30 ? "Easy" : difficultyValue <= 60 ? "Medium" : "Hard";
 
-  // Start interview on mount
-  useEffect(() => {
-    const config: InterviewConfig = {
-      mode,
-      questionType: mode,
-      role,
-      difficulty: difficultyValue,
-      strictness: state?.strictness ?? 50,
-      experienceLevel: state?.experienceLevel ?? 2,
-      interviewer: state?.interviewer ?? "Cassidy",
-    };
-    startInterview(config);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [problem] = useState<TechnicalProblem>(() => getRandomProblem(difficultyValue));
 
+  const interviewConfig: VapiTechnicalConfig = {
+    role,
+    difficulty: difficultyValue,
+    experienceLevel: state?.experienceLevel ?? 50,
+    strictness: state?.strictness ?? 50,
+    questionType: (state?.questionType ?? "technical") as VapiTechnicalConfig["questionType"],
+    problemTitle: problem.title,
+    problemDescription: problem.description,
+  };
+
+  // Start Vapi from a user click (required for browser audio/mic permissions)
+  const handleStart = () => {
+    start(interviewConfig);
+  };
+
+  // Timer — runs while call is active
   useEffect(() => {
+    if (status !== "active") return;
     const timer = setInterval(() => setTime((t) => t + 1), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [status]);
 
-  // Navigate to analytics when finished
-  useEffect(() => {
-    if (status === "finished" && result) {
-      navigate("/analytics", { state: { result } });
+  const analyzeAndNavigate = async () => {
+    const result = await evaluateTranscript(messages, interviewConfig);
+    navigate("/analytics", { state: { result, config: interviewConfig } });
+  };
+
+  const handleEnd = () => {
+    stop();
+    if (messages.length >= 2) {
+      analyzeAndNavigate();
+    } else {
+      navigate("/analytics", { state: { result: null } });
     }
-  }, [status, result, navigate]);
+  };
 
-  // Map messages to transcript format for chat panel
-  const transcript = messages.map((m) => ({
-    speaker: (m.role === "assistant" ? "AI" : "You") as "AI" | "You",
-    text: m.content,
-  }));
+  // When Vapi ends the call naturally, auto-evaluate
+  useEffect(() => {
+    if (callEndedNaturally && messages.length >= 2 && !isAnalyzing) {
+      analyzeAndNavigate();
+    }
+  }, [callEndedNaturally]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Analyzing overlay
+  if (isAnalyzing) {
+    return (
+      <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-lg font-medium text-gray-300">Analyzing your interview...</p>
+        <p className="text-sm text-gray-500 mt-2">This may take a moment</p>
+      </div>
+    );
+  }
+
+  // Ready screen — user must click to grant mic/audio permissions
+  if (status === "idle") {
+    return (
+      <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col items-center justify-center">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-bold mb-2">Technical Interview</h1>
+          <p className="text-gray-400 mb-2">{problem.title} — {problem.difficulty}</p>
+          <p className="text-sm text-gray-500 mb-8">
+            Your AI interviewer will guide you through the problem using voice. Make sure your microphone is ready.
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleStart}
+            className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
+          >
+            <Mic className="w-5 h-5" />
+            <span>Start Interview</span>
+          </motion.button>
+        </div>
+      </div>
+    );
+  }
+
+  // Connecting overlay
+  if (status === "connecting") {
+    return (
+      <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-lg font-medium text-gray-300">Connecting to interviewer...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col p-4 overflow-hidden">
-      {/* Error Banner */}
-      {error && (
-        <div className="mb-2 p-2 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 text-xs">
-          {error}
-        </div>
-      )}
-
       {/* Toolbar */}
       <TechnicalToolbar
         role={role}
         difficulty={difficultyLabel}
         questionNumber={1}
-        totalQuestions={3}
+        totalQuestions={1}
         time={time}
         mode={mode === "hybrid" ? "hybrid" : "technical"}
-        onEnd={() => navigate("/analytics", { state: { result } })}
+        onEnd={handleEnd}
       />
 
       {/* Split Layout */}
@@ -121,23 +150,23 @@ export function TechnicalInterviewLayout() {
         {/* Left Panel — Prompt + Chat */}
         <div className="flex flex-col gap-4 min-h-0">
           <TechnicalPromptCard
-            prompt={MOCK_PROMPT}
+            prompt={problem}
             questionNumber={1}
-            totalQuestions={3}
+            totalQuestions={1}
           />
           <div className="flex-1 min-h-0">
             <TechnicalChatPanel
-              transcript={transcript}
-              isAISpeaking={isLoading}
-              isLoading={isLoading}
-              onSendAnswer={sendAnswer}
+              messages={messages}
+              status={status}
+              isSpeaking={isSpeaking}
+              isListening={isListening}
             />
           </div>
         </div>
 
         {/* Right Panel — Code Editor */}
         <div className="backdrop-blur-lg bg-gray-900/80 rounded-2xl border border-white/10 shadow-xl overflow-hidden flex flex-col min-h-0">
-          <TechnicalCodeEditor />
+          <TechnicalCodeEditor problem={problem} />
         </div>
       </div>
     </div>

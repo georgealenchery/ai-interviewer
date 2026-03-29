@@ -1,101 +1,124 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { MessageSquare } from "lucide-react";
-
-type TranscriptEntry = {
-  speaker: "AI" | "You";
-  text: string;
-};
+import type { TranscriptMessage, CallStatus } from "../../hooks/useVapiInterview";
 
 type TechnicalChatPanelProps = {
-  transcript: TranscriptEntry[];
-  isAISpeaking: boolean;
-  isLoading?: boolean;
-  onSendAnswer?: (text: string) => void;
+  messages: TranscriptMessage[];
+  status: CallStatus;
+  isSpeaking: boolean;
+  isListening: boolean;
 };
 
-export function TechnicalChatPanel({ transcript, isAISpeaking, isLoading, onSendAnswer }: TechnicalChatPanelProps) {
+export function TechnicalChatPanel({ messages, status, isSpeaking, isListening }: TechnicalChatPanelProps) {
   const [showTypeInput, setShowTypeInput] = useState(false);
-  const [typedInput, setTypedInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  function handleSend() {
-    if (!typedInput.trim() || isLoading) return;
-    onSendAnswer?.(typedInput);
-    setTypedInput("");
-  }
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const statusDot = isSpeaking
+    ? "bg-purple-400 animate-pulse"
+    : isListening
+      ? "bg-green-400 animate-pulse"
+      : status === "connecting"
+        ? "bg-blue-400 animate-pulse"
+        : "bg-gray-600";
+
+  const statusLabel = isSpeaking
+    ? "AI Speaking..."
+    : isListening
+      ? "Listening..."
+      : status === "connecting"
+        ? "Connecting..."
+        : status === "ended"
+          ? "Interview ended"
+          : "Ready";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="flex flex-col backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 shadow-xl overflow-hidden"
+      className="flex flex-col h-full backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 shadow-xl overflow-hidden"
     >
-      {/* Panel Header */}
-      <div className="px-5 py-3 border-b border-white/10 flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${isAISpeaking ? "bg-purple-400 animate-pulse" : "bg-gray-600"}`} />
-        <span className="text-xs font-medium text-gray-400">Live Conversation</span>
+      {/* Panel Header with Status */}
+      <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${statusDot}`} />
+          <span className="text-xs font-medium text-gray-400">Live Conversation</span>
+        </div>
+        <span className="text-[10px] font-medium text-gray-500">{statusLabel}</span>
       </div>
 
       {/* Transcript */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
-        {transcript.length === 0 && isLoading && (
-          <p className="text-xs text-gray-500 animate-pulse">Loading first question...</p>
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
+        {messages.length === 0 && status === "connecting" && (
+          <p className="text-xs text-gray-500 animate-pulse">Connecting to interviewer...</p>
         )}
-        {transcript.map((entry, i) => (
-          <div key={i} className={`flex gap-2.5 ${entry.speaker === "You" ? "flex-row-reverse" : ""}`}>
+        {messages.length === 0 && status === "active" && (
+          <p className="text-xs text-gray-500 animate-pulse">Waiting for interviewer...</p>
+        )}
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             <div className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold ${
-              entry.speaker === "AI"
+              msg.role === "assistant"
                 ? "bg-gradient-to-br from-purple-400 to-pink-400 text-white"
                 : "bg-gradient-to-br from-blue-400 to-cyan-400 text-white"
             }`}>
-              {entry.speaker === "AI" ? "C" : "U"}
+              {msg.role === "assistant" ? "I" : "U"}
             </div>
             <div className={`max-w-[80%] px-3 py-2 rounded-xl text-xs leading-relaxed ${
-              entry.speaker === "AI"
+              msg.role === "assistant"
                 ? "bg-purple-500/10 border border-purple-500/20 text-gray-300"
                 : "bg-blue-500/10 border border-blue-500/20 text-gray-300"
             }`}>
               <span className={`block text-[10px] font-semibold mb-1 ${
-                entry.speaker === "AI" ? "text-purple-400" : "text-cyan-400"
+                msg.role === "assistant" ? "text-purple-400" : "text-cyan-400"
               }`}>
-                {entry.speaker === "AI" ? "Cassidy" : "You"}
+                {msg.role === "assistant" ? "Interviewer" : "You"}
               </span>
-              {entry.text}
+              {msg.text}
             </div>
           </div>
         ))}
-        {isLoading && transcript.length > 0 && (
+        {isSpeaking && (
           <div className="flex gap-2.5">
             <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold bg-gradient-to-br from-purple-400 to-pink-400 text-white">
-              C
+              I
             </div>
-            <div className="px-3 py-2 rounded-xl text-xs bg-purple-500/10 border border-purple-500/20 text-gray-500 animate-pulse">
-              Thinking...
+            <div className="px-3 py-2 rounded-xl text-xs bg-purple-500/10 border border-purple-500/20 text-gray-500">
+              <div className="flex items-center gap-1">
+                {[...Array(4)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1 bg-purple-400 rounded-full"
+                    animate={{ height: [4, 12, 4] }}
+                    transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Type Input (conditional) */}
+      {/* Type Input (conditional fallback) */}
       {showTypeInput && (
-        <div className="px-4 py-2 border-t border-white/10 flex gap-2">
-          <input
-            type="text"
-            value={typedInput}
-            onChange={(e) => setTypedInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Explain your approach..."
-            disabled={isLoading}
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
-          />
-          <button
-            onClick={handleSend}
-            disabled={isLoading || !typedInput.trim()}
-            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors font-medium disabled:opacity-50"
-          >
-            Send
-          </button>
+        <div className="px-4 py-2 border-t border-white/10">
+          <p className="text-[10px] text-gray-500 mb-1">Voice is the primary input. Use text as a fallback only.</p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Type if voice isn't working..."
+              disabled
+              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none disabled:opacity-50"
+            />
+          </div>
         </div>
       )}
 

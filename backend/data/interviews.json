@@ -1,5 +1,303 @@
 [
   {
+    "id": "752351e6-8ba2-4f12-a428-2c4137327107",
+    "date": "2026-03-29T05:46:56.974Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 65,
+      "communication": 70,
+      "technicalAccuracy": 60,
+      "problemSolving": 65,
+      "strengths": [
+        "Demonstrated a clear understanding of sorting principles when discussing an approach.",
+        "Engaged in verbalizing thought process, making it easy to follow.",
+        "Utilized examples to clarify explanations, which helped illustrate points."
+      ],
+      "improvements": [
+        "Struggled with implementing iterative approaches initially, needed more practice with coding during the explanation.",
+        "Lacked awareness of edge cases, such as empty strings or large datasets.",
+        "Could improve technical vocabulary, as some terms were used imprecisely, leading to confusion."
+      ],
+      "nextSteps": [
+        "Practice solving common algorithm challenges on platforms like LeetCode or HackerRank.",
+        "Study time and space complexity, ensuring a better understanding of efficiency.",
+        "Engage in pair programming to practice articulating ideas and solutions with peers."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the group anagrams problem in front of you? Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "I think I could start by sorting each word to see if they can be grouped. If two words produce the same sorted output, they are anagrams.",
+          "score": 70,
+          "feedback": "Good initial approach by mentioning sorting. This indicates a grasp of the general concept. However, the practical application of this idea and handling of edge cases needs improvement."
+        }
+      ]
+    }
+  },
+  {
+    "id": "fcad7ec6-6515-4ea8-9680-8078185629d5",
+    "date": "2026-03-29T05:39:27.442Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 30,
+      "communication": 40,
+      "technicalAccuracy": 20,
+      "problemSolving": 30,
+      "strengths": [
+        "Willingness to seek clarification when unsure about tasks, e.g., asking about 'where to add console log'.",
+        "Showing an understanding that debugging is an important part of coding.",
+        "Attempted to articulate a methodical thought process of approaching the problem."
+      ],
+      "improvements": [
+        "Lacked a clear structure in explaining logic; struggled with coherent coding approach throughout the conversation.",
+        "Relied heavily on prompts from the interviewer and was hesitant to take initiative in coding.",
+        "Demonstrated difficulty in articulating a solution for the two-sum problem, not showcasing sufficient technical knowledge."
+      ],
+      "nextSteps": [
+        "Practice coding problems with a focus on common algorithms and data structures like two-sum, and ensure able to articulate steps.",
+        "Work on coding clarity and structure; try to explain thought processes clearly as if teaching someone else.",
+        "Engage in pair programming or coding discussions to better express coding strategies and clarify understanding."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "I would say that we would need an if loop here.",
+          "score": 40,
+          "feedback": "The candidate starts to think about using an if loop, but did not provide a solid explanation of how it relates to solving the problem."
+        },
+        {
+          "question": "Can you explain how you'd use the if loop? What would you be checking for inside it?",
+          "candidateAnswer": "I think this.",
+          "score": 20,
+          "feedback": "The answer is vague and does not provide any insight into what conditions would be checked, indicating a lack of understanding."
+        },
+        {
+          "question": "How do you plan to go through the array to find the pair that adds up to the target?",
+          "candidateAnswer": "Where should I add the console log?",
+          "score": 30,
+          "feedback": "While the question about console logging shows critical thinking, it indicates that the candidate is not focused on the actual coding solution."
+        },
+        {
+          "question": "What kind of loop were you planning to use for the 2 sum problem?",
+          "candidateAnswer": "See.",
+          "score": 10,
+          "feedback": "The response is not coherent and does not communicate any actual thought or approach to the problem."
+        },
+        {
+          "question": "Go ahead and show me your loop or your code so far.",
+          "candidateAnswer": "Say, basically, that's what it would be. And then.",
+          "score": 20,
+          "feedback": "The candidate fails to provide clear code or logic, indicating an inability to articulate or construct the solution."
+        }
+      ]
+    }
+  },
+  {
+    "id": "6d2f6713-bddf-4927-a2ed-34936551d176",
+    "date": "2026-03-29T04:47:41.170Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 25,
+      "communication": 30,
+      "technicalAccuracy": 10,
+      "problemSolving": 20,
+      "strengths": [
+        "Attempted to engage with the problem despite initial confusion.",
+        "Showed willingness to participate by giving verbal affirmations such as 'Okay.'"
+      ],
+      "improvements": [
+        "Lacked focus on the specific problem at hand, often drifted to unrelated topics.",
+        "Struggled to articulate clear thoughts on the 2 sum problem due to unrelated answers.",
+        "Demonstrated confusion about the problem requirements, mentioning irrelevant concepts."
+      ],
+      "nextSteps": [
+        "Practice focused problem-solving on common coding challenges like Two Sum.",
+        "Engage in mock interviews to simulate a structured question-response format.",
+        "Work on articulating thoughts clearly and concisely, especially in a technical context."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "Expressed confusion and did not relate specifically to the 2 sum problem, discussing unrelated topics.",
+          "score": 15,
+          "feedback": "The answer lacked relevance to the question, demonstrating a significant need for clarity and focus on the given problem."
+        },
+        {
+          "question": "Where were you and your solution for the 2 sum problem?",
+          "candidateAnswer": "Failed to provide an answer related to the 2 sum problem, instead mentioned unrelated transactions and cloud projects.",
+          "score": 5,
+          "feedback": "The response was entirely off-topic, showing confusion about the problem requirements, which negatively impacted technical accuracy and problem-solving abilities."
+        }
+      ]
+    }
+  },
+  {
+    "id": "19083e31-e828-41eb-bd0c-bb85d9c2e436",
+    "date": "2026-03-29T04:26:31.625Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 60,
+      "communication": 65,
+      "technicalAccuracy": 70,
+      "problemSolving": 55,
+      "strengths": [
+        "Demonstrated a basic understanding of React and TypeScript concepts.",
+        "Mentioned the importance of breaking down the feature into smaller tasks.",
+        "Showed willingness to learn and adapt by referencing past experiences."
+      ],
+      "improvements": [
+        "Could provide more specific examples and details about the feature he built.",
+        "Needs to enhance articulation to convey thoughts more clearly.",
+        "Should practice summarizing complex technical processes in a concise manner."
+      ],
+      "nextSteps": [
+        "Study more on React and TypeScript integration to enhance practical knowledge.",
+        "Engage in coding exercises that require building features in React with TypeScript.",
+        "Participate in mock interviews to improve communication and clarity."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Think about a time when you had to add a new feature to a React app with TypeScript. Can you describe the situation, and what steps you took to build it?",
+          "candidateAnswer": "So yeah.",
+          "score": 40,
+          "feedback": "The response was too vague and did not provide any substantial answer. The candidate should aim to structure their response with specific situations, actions taken, and results to better illustrate their experience."
+        }
+      ]
+    }
+  },
+  {
+    "id": "1d7c21fd-ee57-45ae-8485-bef4a9b49648",
+    "date": "2026-03-29T04:03:14.072Z",
+    "role": "ml",
+    "questionType": "behavioral",
+    "config": {
+      "role": "ml",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 55,
+      "communication": 60,
+      "technicalAccuracy": 65,
+      "problemSolving": 50,
+      "strengths": [
+        "Displayed willingness to discuss past experiences, which aligns with behavioral interview expectations.",
+        "Mentioned using mock data and simulations, indicating an understanding of testing methodologies.",
+        "Highlighted the importance of research in debugging, showing a mindset towards continuous learning."
+      ],
+      "improvements": [
+        "Answers lacked specific details on the debugging process, which made it difficult to assess the logical steps taken.",
+        "Communication was somewhat unclear at times, with vague phrases like 'sometimes there's these limitations' without elaboration.",
+        "Could improve use of technical terminology to describe debugging methods more effectively and precisely."
+      ],
+      "nextSteps": [
+        "Practice structuring responses using specific frameworks like STAR (Situation, Task, Action, Result) for clarity.",
+        "Gain more hands-on experience with debugging in real-world coding scenarios to build confidence and expertise.",
+        "Work on articulating technical processes clearly, perhaps through mock interviews or study groups."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you had to debug a tricky bug in your code. What steps did you take to find and fix it?",
+          "candidateAnswer": "Described a bug in navigation software that lost direction when the device was oriented upwards, and mentioned working with 'sputurinions' to resolve the issue.",
+          "score": 50,
+          "feedback": "The candidate identified an issue but did not clearly articulate the debugging steps taken or the role of the suggested fix."
+        },
+        {
+          "question": "Can you walk me through your exact debugging steps? For example, did you add logs, use breakpoints, or do any tests?",
+          "candidateAnswer": "Mentioned limitations related to physics and the need for research, but did not clearly outline specific debugging steps.",
+          "score": 45,
+          "feedback": "The answer was somewhat vague and did not provide clear examples of debugging techniques employed."
+        },
+        {
+          "question": "Can you explain how you tested your changes? Did you try different sensors on real devices? Or did you use simulation?",
+          "candidateAnswer": "Explained using simulations and mock data to test changes.",
+          "score": 65,
+          "feedback": "The use of simulations and mock data is a good point, but more detail on how this related to the actual changes and results would enhance the answer."
+        },
+        {
+          "question": "Did you also add any logging or error messages to check if your fix worked in the real environment, not just simulation?",
+          "candidateAnswer": "Stated that logging was part of their workflow and emphasized the importance of accurate testing.",
+          "score": 60,
+          "feedback": "While it’s positive to mention logging, further specifics would help demonstrate a thorough understanding of the testing process."
+        }
+      ]
+    }
+  },
+  {
+    "id": "e6ef0e52-5951-4ac1-9a5f-f95da4ce1b2a",
+    "date": "2026-03-29T03:58:26.375Z",
+    "role": "backend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "backend",
+      "difficulty": 100,
+      "experienceLevel": 3,
+      "strictness": 100,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 35,
+      "communication": 40,
+      "technicalAccuracy": 20,
+      "problemSolving": 30,
+      "strengths": [
+        "Displayed enthusiasm for the role, indicating a positive attitude.",
+        "Attempted to engage with the interviewer, building rapport early on."
+      ],
+      "improvements": [
+        "Lacked concrete examples from actual experiences; mentioned a fictional scenario instead of real work.",
+        "Struggled with clarity; responses were vague and disorganized.",
+        "Did not demonstrate sufficient understanding of API design principles or specific technical skills."
+      ],
+      "nextSteps": [
+        "Engage in real projects that involve API design to gather concrete examples.",
+        "Practice articulating technical experiences clearly and concisely.",
+        "Study foundational concepts of API design, including RESTful best practices."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you had to design or improve an API. What was the goal? How did you approach it?",
+          "candidateAnswer": "Mentioned fixing a bad API for Google but didn't provide a real project experience, instead cited a school project using the OpenTrivia API.",
+          "score": 30,
+          "feedback": "The answer lacked specificity and relied on fictional scenarios rather than real-world experience, which does not meet the expectation for a junior candidate who needs to refer to tangible experiences."
+        }
+      ]
+    }
+  },
+  {
     "id": "2084542c-125b-46a9-97b5-fd04a9032d51",
     "date": "2026-03-29T03:44:36.249Z",
     "role": "frontend",
