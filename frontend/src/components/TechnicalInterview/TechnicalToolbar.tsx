@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 type TechnicalToolbarProps = {
   role: string;
   difficulty: string;
+  level: string;
   questionNumber: number;
   totalQuestions: number;
   time: number;
@@ -13,6 +14,7 @@ type TechnicalToolbarProps = {
 export function TechnicalToolbar({
   role,
   difficulty,
+  level,
   questionNumber,
   totalQuestions,
   time,
@@ -25,13 +27,9 @@ export function TechnicalToolbar({
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">
-              Technical Interview
-            </h1>
-          </div>
-          <p className="text-sm text-gray-400">
-            {role} · {difficulty} · Q{questionNumber}/{totalQuestions}
+          <h1 className="text-xl font-bold text-white">Technical Interview</h1>
+          <p className="text-sm text-gray-400 capitalize">
+            {role} · {difficulty} · {level} · Q{questionNumber}/{totalQuestions}
           </p>
         </div>
       </div>

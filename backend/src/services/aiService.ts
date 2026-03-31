@@ -1,12 +1,12 @@
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { OPENAI_MODEL } from "../config";
-import { buildFollowUpPrompt } from "../prompts/followUp";
+import { buildFollowUpPrompt } from "../prompts/followup";
 import { buildEvaluationPrompt } from "../prompts/evaluation";
 import { buildBehavioralPrompt } from "../prompts/behavioral";
 import { buildTechnicalPrompt } from "../prompts/technical";
 import { formatTranscript } from "../utils/formatter";
-import type { Message, InterviewConfig, EvaluationResult, VapiTranscriptEntry, VapiInterviewConfig, VapiAnalysisResult } from "../types/interview";
+import type { Message, InterviewConfig, EvaluationResult, VapiTranscriptEntry, VapiInterviewConfig, VapiAnalysisResult, CodingProblem } from "../types/interview";
 
 const openai = new OpenAI();
 
@@ -108,6 +108,139 @@ const DEFAULT_VAPI_ANALYSIS: VapiAnalysisResult = {
   nextSteps: ["Retry the interview for a complete evaluation"],
   questionBreakdown: [],
 };
+
+const ROLE_GUIDELINES: Record<string, string> = {
+  frontend: "React, JavaScript, state management, performance, CSS",
+  backend: "APIs, databases, authentication, system design",
+  fullstack: "frontend + backend integration, APIs, data flow",
+  machine_learning: "models, training, evaluation, data processing",
+  mobile: "React Native, mobile performance, UI/UX, state",
+  cybersecurity: "authentication, vulnerabilities, encryption, secure systems",
+  systems: "low-level design, OS concepts, concurrency, performance",
+  devops: "CI/CD, cloud infrastructure, Docker, deployment systems",
+};
+
+const FALLBACK_PROBLEMS: CodingProblem[] = [
+  {
+    prompt: "Write a function that takes an array of numbers and returns the two numbers that add up to a given target sum. Return them as an array in the order they appear.",
+    functionName: "twoSum",
+    functionSignature: "function twoSum(nums, target) {\n  // Your implementation here\n}",
+    testCases: [
+      { input: [[2, 7, 11, 15], 9], expectedOutput: [2, 7] },
+      { input: [[3, 2, 4], 6], expectedOutput: [2, 4] },
+      { input: [[1, 5, 3, 7], 8], expectedOutput: [1, 7] },
+    ],
+  },
+  {
+    prompt: "Write a function that takes a string and returns true if it is a valid palindrome (ignoring non-alphanumeric characters and case), false otherwise.",
+    functionName: "isPalindrome",
+    functionSignature: "function isPalindrome(s) {\n  // Your implementation here\n}",
+    testCases: [
+      { input: ["A man, a plan, a canal: Panama"], expectedOutput: true },
+      { input: ["race a car"], expectedOutput: false },
+      { input: ["Was it a car or a cat I saw?"], expectedOutput: true },
+    ],
+  },
+  {
+    prompt: "Write a function that takes an array of integers and returns the maximum sum of any contiguous subarray.",
+    functionName: "maxSubarraySum",
+    functionSignature: "function maxSubarraySum(nums) {\n  // Your implementation here\n}",
+    testCases: [
+      { input: [[-2, 1, -3, 4, -1, 2, 1, -5, 4]], expectedOutput: 6 },
+      { input: [[1]], expectedOutput: 1 },
+      { input: [[5, 4, -1, 7, 8]], expectedOutput: 23 },
+    ],
+  },
+];
+
+/**
+ * Generate 3 role-aware, difficulty-aware coding interview problems.
+ */
+export async function generateInterviewQuestions(
+  role: string,
+  difficulty: string,
+  level: string,
+): Promise<CodingProblem[]> {
+  console.log("Role:", role);
+  console.log("Difficulty:", difficulty);
+  console.log("Level:", level);
+
+  const guidelines = ROLE_GUIDELINES[role] ?? "software engineering fundamentals";
+
+  const prompt = `You are a senior ${role} engineer creating a ${level}-level ${difficulty} technical coding interview.
+
+Focus on: ${guidelines}
+
+Generate EXACTLY 3 coding problems. Each problem must:
+- Be a realistic, role-relevant coding challenge (not a pure abstract algorithm)
+- Require writing a JavaScript function
+- Be solvable in 10-20 minutes at the ${difficulty} difficulty
+- Test different concepts
+- Have 3-5 concrete test cases with actual input values and expected outputs
+
+Difficulty guide:
+- easy: straightforward logic, no complex algorithms, clear requirements
+- medium: requires some problem-solving, moderate complexity
+- hard: requires optimized solutions, edge-case handling, or advanced patterns
+
+Return ONLY valid JSON in this exact format (no markdown, no extra text):
+[
+  {
+    "prompt": "Clear problem description with context and requirements...",
+    "functionName": "camelCaseFunctionName",
+    "functionSignature": "function camelCaseFunctionName(param1, param2) {\\n  // Your implementation here\\n}",
+    "testCases": [
+      { "input": [arg1, arg2], "expectedOutput": result },
+      { "input": [arg1, arg2], "expectedOutput": result },
+      { "input": [arg1, arg2], "expectedOutput": result }
+    ]
+  }
+]`;
+
+  const res = await openai.chat.completions.create({
+    model: OPENAI_MODEL,
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: "You are a coding interview problem generator. Always return a JSON object with a 'problems' array containing exactly 3 coding problems.",
+      },
+      { role: "user", content: prompt + '\n\nWrap the array in: { "problems": [...] }' },
+    ],
+  });
+
+  const raw = res.choices[0]?.message.content ?? "{}";
+
+  try {
+    const parsed = JSON.parse(raw) as { problems?: CodingProblem[] };
+    const problems = parsed.problems;
+
+    if (!Array.isArray(problems) || problems.length !== 3) {
+      console.error("Expected 3 problems, got:", problems?.length);
+      return FALLBACK_PROBLEMS;
+    }
+
+    const valid = problems.every(
+      (p) =>
+        typeof p.prompt === "string" &&
+        typeof p.functionName === "string" &&
+        typeof p.functionSignature === "string" &&
+        Array.isArray(p.testCases) &&
+        p.testCases.length >= 1,
+    );
+
+    if (!valid) {
+      console.error("Invalid problem structure in response");
+      return FALLBACK_PROBLEMS;
+    }
+
+    console.log("Generated coding problems:", problems);
+    return problems;
+  } catch {
+    console.error("Failed to parse coding problems response:", raw);
+    return FALLBACK_PROBLEMS;
+  }
+}
 
 /**
  * Analyze a completed Vapi voice interview transcript.

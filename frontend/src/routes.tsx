@@ -6,34 +6,47 @@ import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
 import { DashboardDemo } from "./components/DashboardDemo";
 import { TechnicalInterviewLayout } from "./components/TechnicalInterview/TechnicalInterviewLayout";
 import { VapiInterviewPanel } from "./components/VapiInterviewPanel";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { LoginPage } from "./pages/LoginPage";
+import { SignupPage } from "./pages/SignupPage";
 
 export const router = createBrowserRouter([
+  // Public routes
+  {
+    path: "/login",
+    Component: LoginPage,
+  },
+  {
+    path: "/signup",
+    Component: SignupPage,
+  },
+  // Protected routes
   {
     path: "/",
-    Component: HeroPage,
+    element: <ProtectedRoute><HeroPage /></ProtectedRoute>,
   },
   {
     path: "/dashboard",
-    Component: DashboardDemo,
+    element: <ProtectedRoute><DashboardDemo /></ProtectedRoute>,
   },
   {
     path: "/roles",
-    Component: RoleSelection,
+    element: <ProtectedRoute><RoleSelection /></ProtectedRoute>,
   },
   {
     path: "/setup",
-    Component: SetupDashboard,
+    element: <ProtectedRoute><SetupDashboard /></ProtectedRoute>,
   },
   {
     path: "/interview/voice",
-    Component: VapiInterviewPanel,
+    element: <ProtectedRoute><VapiInterviewPanel /></ProtectedRoute>,
   },
   {
     path: "/technical-interview",
-    Component: TechnicalInterviewLayout,
+    element: <ProtectedRoute><TechnicalInterviewLayout /></ProtectedRoute>,
   },
   {
     path: "/analytics",
-    Component: AnalyticsDashboard,
+    element: <ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>,
   },
 ]);

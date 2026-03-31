@@ -1,345 +1,183 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
-import { motion } from "motion/react";
-import { RotateCcw, Play, FlaskConical, Trash2, ChevronDown, ChevronUp } from "lucide-react";
-import type { TechnicalProblem, Language } from "../../data/technicalProblems";
+import { Play, CheckCircle2, XCircle, Circle } from "lucide-react";
+import type { CodingProblem, TestCase } from "../../services/api";
 
-const LANGUAGE_LABELS: Record<Language, string> = {
-  javascript: "JavaScript",
-  typescript: "TypeScript",
-  python: "Python",
+type TestResult = {
+  passed: boolean;
+  actual: string;
+  expected: string;
+  error?: string;
 };
-
-type OutputEntry = {
-  type: "log" | "error" | "result" | "test-pass" | "test-fail";
-  text: string;
-};
-
-function stripTypeAnnotations(tsCode: string): string {
-  // Remove type annotations from TypeScript code to run as JavaScript
-  // This is a simple approach — good enough for interview problems
-  let code = tsCode;
-  // Remove `: type` after parameters and variables (handles generics, arrays, etc.)
-  code = code.replace(/:\s*[A-Za-z_][\w<>\[\],\s|&?]*(?=\s*[=,)\]{;])/g, "");
-  // Remove `as type` casts
-  code = code.replace(/\s+as\s+[A-Za-z_][\w<>\[\],\s|&?]*/g, "");
-  // Remove angle bracket type assertions
-  code = code.replace(/<[A-Za-z_][\w<>\[\],\s|&?]*>\s*(?=\()/g, "");
-  // Remove interface/type declarations (entire blocks)
-  code = code.replace(/^(interface|type)\s+\w+[\s\S]*?^}/gm, "");
-  return code;
-}
-
-function executeJavaScript(
-  code: string,
-  testCases: TechnicalProblem["testCases"],
-): OutputEntry[] {
-  const outputs: OutputEntry[] = [];
-  const originalLog = console.log;
-  const originalError = console.error;
-  const originalWarn = console.warn;
-
-  // Capture any console.log calls the user may have added
-  console.log = (...args: unknown[]) => {
-    outputs.push({
-      type: "log",
-      text: args.map((a) => (typeof a === "object" ? JSON.stringify(a, null, 2) : String(a))).join(" "),
-    });
-  };
-  console.error = (...args: unknown[]) => {
-    outputs.push({
-      type: "error",
-      text: args.map((a) => (typeof a === "object" ? JSON.stringify(a, null, 2) : String(a))).join(" "),
-    });
-  };
-  console.warn = (...args: unknown[]) => {
-    outputs.push({
-      type: "log",
-      text: "[warn] " + args.map((a) => (typeof a === "object" ? JSON.stringify(a, null, 2) : String(a))).join(" "),
-    });
-  };
-
-  try {
-    // Run the user's code, then auto-invoke the function with each example input
-    for (const tc of testCases) {
-      try {
-        const runCode = `${code}\nreturn ${tc.call};`;
-        const fn = new Function(runCode);
-        const result = fn();
-        const formatted = typeof result === "object" ? JSON.stringify(result) : String(result);
-        outputs.push({
-          type: "result",
-          text: `${tc.call}  →  ${formatted}`,
-        });
-      } catch (err: unknown) {
-        const error = err as Error;
-        outputs.push({
-          type: "error",
-          text: `${tc.call}  →  ${error.name}: ${error.message}`,
-        });
-      }
-    }
-  } finally {
-    console.log = originalLog;
-    console.error = originalError;
-    console.warn = originalWarn;
-  }
-
-  return outputs;
-}
-
-function runTestCases(
-  code: string,
-  testCases: TechnicalProblem["testCases"],
-): OutputEntry[] {
-  const outputs: OutputEntry[] = [];
-  const originalLog = console.log;
-  const originalError = console.error;
-  const originalWarn = console.warn;
-
-  // Suppress console during test execution
-  console.log = () => {};
-  console.error = () => {};
-  console.warn = () => {};
-
-  try {
-    // Define functions from the user's code, then run test calls
-    for (const tc of testCases) {
-      try {
-        const testCode = `${code}\nreturn String(${tc.call});`;
-        const fn = new Function(testCode);
-        const result = String(fn());
-        const expected = tc.expected;
-        const passed = result === expected;
-        outputs.push({
-          type: passed ? "test-pass" : "test-fail",
-          text: passed
-            ? `PASS  Input: ${tc.input} => ${result}`
-            : `FAIL  Input: ${tc.input} => Got ${result}, Expected ${expected}`,
-        });
-      } catch (err: unknown) {
-        const error = err as Error;
-        outputs.push({
-          type: "test-fail",
-          text: `ERROR  Input: ${tc.input} => ${error.message}`,
-        });
-      }
-    }
-  } finally {
-    console.log = originalLog;
-    console.error = originalError;
-    console.warn = originalWarn;
-  }
-
-  return outputs;
-}
 
 type TechnicalCodeEditorProps = {
-  problem: TechnicalProblem;
-  onAllTestsPass?: () => void;
+  problem: CodingProblem | null;
+  questionIndex: number;
+  onAllTestsPassed: (passed: boolean) => void;
 };
 
-export function TechnicalCodeEditor({ problem, onAllTestsPass }: TechnicalCodeEditorProps) {
-  const [language, setLanguage] = useState<Language>("javascript");
-  const [code, setCode] = useState<string>(problem.starterCode.javascript);
-  const [output, setOutput] = useState<OutputEntry[]>([]);
-  const [showOutput, setShowOutput] = useState(false);
-
-  const handleLanguageChange = useCallback((lang: Language) => {
-    setLanguage(lang);
-    setCode(problem.starterCode[lang]);
-  }, [problem]);
-
-  function handleReset() {
-    setCode(problem.starterCode[language]);
-    setOutput([]);
+function runTestCase(code: string, functionName: string, testCase: TestCase): TestResult {
+  const expected = JSON.stringify(testCase.expectedOutput);
+  try {
+    // Wrap the user code and return the named function
+    // eslint-disable-next-line no-new-func
+    const fn = new Function(`${code}; return ${functionName};`)() as (...args: unknown[]) => unknown;
+    const result = fn(...testCase.input);
+    const actual = JSON.stringify(result);
+    return { passed: actual === expected, actual, expected };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    return { passed: false, actual: "Error", expected, error };
   }
+}
 
-  function handleRunCode() {
-    if (language === "python") {
-      setOutput([{
-        type: "error",
-        text: "Python execution is not supported in the browser. Switch to JavaScript or TypeScript to run code locally.",
-      }]);
-      setShowOutput(true);
-      return;
+function formatValue(val: string): string {
+  try {
+    return JSON.stringify(JSON.parse(val), null, 0);
+  } catch {
+    return val;
+  }
+}
+
+export function TechnicalCodeEditor({ problem, questionIndex, onAllTestsPassed }: TechnicalCodeEditorProps) {
+  const [code, setCode] = useState<string>("");
+  const [results, setResults] = useState<TestResult[] | null>(null);
+  const [hasRun, setHasRun] = useState(false);
+  const prevIndexRef = useRef(questionIndex);
+
+  // Reset editor when question changes
+  useEffect(() => {
+    if (prevIndexRef.current !== questionIndex) {
+      prevIndexRef.current = questionIndex;
+      setResults(null);
+      setHasRun(false);
+      onAllTestsPassed(false);
     }
+    setCode(problem?.functionSignature ?? "");
+  }, [questionIndex, problem]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const execCode = language === "typescript" ? stripTypeAnnotations(code) : code;
-    const results = executeJavaScript(execCode, problem.testCases);
-    setOutput(results);
-    setShowOutput(true);
+  const handleRunTests = () => {
+    if (!problem) return;
 
-    // If every result came back without errors, the solution works — notify parent
-    const allPassed = results.length > 0 && results.every((r) => r.type !== "error");
-    if (allPassed && onAllTestsPass) {
-      onAllTestsPass();
-    }
-  }
+    const testResults = problem.testCases.map((tc) =>
+      runTestCase(code, problem.functionName, tc)
+    );
 
-  function handleRunTests() {
-    if (language === "python") {
-      setOutput([{
-        type: "error",
-        text: "Python test execution is not supported in the browser. Switch to JavaScript or TypeScript.",
-      }]);
-      setShowOutput(true);
-      return;
-    }
+    setResults(testResults);
+    setHasRun(true);
 
-    const execCode = language === "typescript" ? stripTypeAnnotations(code) : code;
-    const results = runTestCases(execCode, problem.testCases);
-    setOutput(results);
-    setShowOutput(true);
-  }
+    const allPassed = testResults.every((r) => r.passed);
+    console.log("Test results:", testResults);
+    onAllTestsPassed(allPassed);
+  };
 
-  function handleClearOutput() {
-    setOutput([]);
-  }
+  const allPassed = hasRun && results?.every((r) => r.passed);
+  const passCount = results?.filter((r) => r.passed).length ?? 0;
+  const totalCount = problem?.testCases.length ?? 0;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Editor Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-800/80 border-b border-white/10 rounded-t-2xl">
-        {/* Language Selector */}
-        <div className="flex gap-1">
-          {(Object.keys(problem.starterCode) as Language[]).map((lang) => (
-            <button
-              key={lang}
-              onClick={() => handleLanguageChange(lang)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                language === lang
-                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                  : "text-gray-400 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              {LANGUAGE_LABELS[lang]}
-            </button>
-          ))}
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 bg-gray-800/80 border-b border-white/10 rounded-t-2xl shrink-0">
+        <div className="flex items-center gap-2 text-gray-300 text-xs font-medium">
+          <span className="text-blue-400 font-mono">{problem?.functionName ?? "solution"}.js</span>
+          {hasRun && (
+            <span className={allPassed ? "text-green-400" : "text-yellow-400"}>
+              {passCount}/{totalCount} tests passed
+            </span>
+          )}
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleReset}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            Reset
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleRunTests}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all"
-          >
-            <FlaskConical className="w-3.5 h-3.5" />
-            Run Tests
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleRunCode}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all"
-          >
-            <Play className="w-3.5 h-3.5" />
-            Run Code
-          </motion.button>
-        </div>
+        <button
+          onClick={handleRunTests}
+          disabled={!problem}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all"
+        >
+          <Play className="w-3.5 h-3.5 fill-white" />
+          Run Tests
+        </button>
       </div>
 
       {/* Monaco Editor */}
-      <div className={`${showOutput ? "flex-[7]" : "flex-1"} min-h-0 overflow-hidden`}>
+      <div className="flex-1 min-h-0 overflow-hidden" style={{ minHeight: "200px" }}>
         <Editor
           height="100%"
-          language={language}
+          language="javascript"
           value={code}
           onChange={(val) => setCode(val ?? "")}
           theme="vs-dark"
           options={{
             fontSize: 14,
             minimap: { enabled: false },
+            wordWrap: "off",
             scrollBeyondLastLine: false,
-            lineNumbers: "on",
-            renderLineHighlight: "all",
             padding: { top: 16, bottom: 16 },
             fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
             fontLigatures: true,
-            tabSize: language === "python" ? 4 : 2,
-            wordWrap: "on",
+            tabSize: 2,
+            folding: false,
+            lineDecorationsWidth: 4,
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            scrollbar: { vertical: "auto", horizontal: "auto" },
           }}
         />
       </div>
 
-      {/* Output Panel */}
-      {showOutput && (
-        <div className="flex-[3] min-h-0 flex flex-col border-t border-white/10 bg-gray-950">
-          {/* Output Header */}
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-900/80 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-400">Output</span>
-              {output.some((o) => o.type === "test-pass" || o.type === "test-fail") && (
-                <span className="text-[10px] text-gray-500">
-                  {output.filter((o) => o.type === "test-pass").length}/{output.filter((o) => o.type === "test-pass" || o.type === "test-fail").length} passed
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handleClearOutput}
-                className="p-1 rounded text-gray-500 hover:text-gray-300 transition-colors"
-                title="Clear Output"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setShowOutput(false)}
-                className="p-1 rounded text-gray-500 hover:text-gray-300 transition-colors"
-                title="Collapse Output"
-              >
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
+      {/* Test Results Panel */}
+      <div className="shrink-0 border-t border-white/10 bg-gray-900/80 max-h-52 overflow-y-auto">
+        {!hasRun && (
+          <div className="px-4 py-3 text-xs text-gray-500 flex items-center gap-2">
+            <Circle className="w-3.5 h-3.5" />
+            Run your code to see test results
           </div>
+        )}
 
-          {/* Output Content */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 font-mono text-xs space-y-1">
-            {output.map((entry, i) => (
-              <div
-                key={i}
-                className={
-                  entry.type === "error"
-                    ? "text-red-400"
-                    : entry.type === "test-pass"
-                      ? "text-emerald-400"
-                      : entry.type === "test-fail"
-                        ? "text-red-400"
-                        : entry.type === "result"
-                          ? "text-cyan-400"
-                          : "text-green-400"
-                }
-              >
-                <pre className="whitespace-pre-wrap">{entry.type === "test-pass" ? "\u2713 " : entry.type === "test-fail" ? "\u2717 " : ""}{entry.text}</pre>
-              </div>
-            ))}
+        {hasRun && results && (
+          <div className="divide-y divide-white/5">
+            {results.map((result, i) => {
+              const tc = problem?.testCases[i];
+              return (
+                <div
+                  key={i}
+                  className={`px-4 py-2.5 text-xs ${result.passed ? "bg-green-900/10" : "bg-red-900/10"}`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    {result.passed ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                    ) : (
+                      <XCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                    )}
+                    <span className={result.passed ? "text-green-400 font-semibold" : "text-red-400 font-semibold"}>
+                      Test {i + 1}
+                    </span>
+                    {tc?.description && (
+                      <span className="text-gray-500">— {tc.description}</span>
+                    )}
+                  </div>
+                  <div className="ml-5 space-y-0.5 font-mono text-gray-400">
+                    <div>
+                      <span className="text-gray-500">input:&nbsp;&nbsp;&nbsp;</span>
+                      <span className="text-gray-200">{JSON.stringify(tc?.input)}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">expected: </span>
+                      <span className="text-gray-200">{formatValue(result.expected)}</span>
+                    </div>
+                    {!result.passed && (
+                      <div>
+                        <span className="text-gray-500">actual:&nbsp;&nbsp; </span>
+                        <span className={result.error ? "text-red-300" : "text-yellow-300"}>
+                          {result.error ? `Error: ${result.error}` : formatValue(result.actual)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      )}
-
-      {/* Collapsed output toggle */}
-      {!showOutput && output.length > 0 && (
-        <button
-          onClick={() => setShowOutput(true)}
-          className="flex items-center justify-center gap-2 px-4 py-1.5 bg-gray-900/80 border-t border-white/10 text-xs text-gray-500 hover:text-gray-300 transition-colors"
-        >
-          <ChevronUp className="w-3 h-3" />
-          Show Output ({output.length} {output.length === 1 ? "line" : "lines"})
-        </button>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,1429 @@
 [
   {
+    "id": "57f2013b-ce9a-4cd1-8b77-aae42c5fc94d",
+    "date": "2026-03-29T20:36:58.967Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 55,
+      "communication": 60,
+      "technicalAccuracy": 65,
+      "problemSolving": 50,
+      "strengths": [
+        "Demonstrated an understanding of the problem with a basic explanation.",
+        "Attempted to structure the solution logically by considering edge cases.",
+        "Engaged in iterative thinking by willing to refine the approach."
+      ],
+      "improvements": [
+        "Could explain thoughts more clearly instead of mumbling.",
+        "Lacked depth in the initial approach; needed more detail on merging logic.",
+        "Struggled with technical terms, leading to confusion in communication."
+      ],
+      "nextSteps": [
+        "Practice explaining coding concepts out loud to improve clarity.",
+        "Study and implement basic data structures, focusing on arrays and sorting.",
+        "Work on similar coding challenges to improve problem-solving strategies."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the merge intervals problem in front of you. Take a moment to read through it. When you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "I think I need to sort the intervals first, and then check each interval to see if I can merge them.",
+          "score": 60,
+          "feedback": "You have the right idea by starting with sorting, but your answer would benefit from additional explanation about how the merging would occur, such as checking for overlaps. Clearer communication would also help convey your thought process."
+        }
+      ]
+    }
+  },
+  {
+    "id": "054db0a2-22fe-4c37-bc11-a8e0696c8c27",
+    "date": "2026-03-29T20:35:04.787Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 60,
+      "communication": 70,
+      "technicalAccuracy": 50,
+      "problemSolving": 55,
+      "strengths": [
+        "Willingness to engage in detailed discussion on debugging",
+        "Demonstrates a basic understanding of UI concepts",
+        "Shows enthusiasm and readiness to participate"
+      ],
+      "improvements": [
+        "Need to provide more structured and detailed problem-solving steps",
+        "Could enhance technical vocabulary and clarity in explanations",
+        "Lack of specific examples or experiences hinders showcasing expertise"
+      ],
+      "nextSteps": [
+        "Practice structuring answers to behavioral questions using the STAR method (Situation, Task, Action, Result)",
+        "Familiarize with common debugging techniques in React and other frameworks",
+        "Engage in mock interviews to improve clarity and confidence in responses"
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you had to debug a tricky UI bug in a React app. What steps did you take to find and fix the problem?",
+          "candidateAnswer": "The candidate did not provide a specific scenario or structured steps for debugging a UI bug.",
+          "score": 40,
+          "feedback": "The answer lacked clarity and specificity. It is important for the candidate to prepare a concrete example showcasing their problem-solving process, including specific tools or methods used in debugging."
+        }
+      ]
+    }
+  },
+  {
+    "id": "c7ed600b-e3ab-45fc-8193-82445250279e",
+    "date": "2026-03-29T20:29:21.967Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 60,
+      "communication": 70,
+      "technicalAccuracy": 55,
+      "problemSolving": 65,
+      "strengths": [
+        "Demonstrated understanding of React fundamentals, such as component lifecycle.",
+        "Expressed eagerness to learn and grow in frontend technologies.",
+        "Communicated effectively and maintained a polite and positive demeanor."
+      ],
+      "improvements": [
+        "Lacked depth in explaining technical concepts; for example, struggled with defining specific React hooks.",
+        "Limited experience with TypeScript, leading to vague answers on type safety.",
+        "Could not provide concrete examples of past projects or challenges faced."
+      ],
+      "nextSteps": [
+        "Engage in more hands-on React projects to solidify understanding of hooks and component structures.",
+        "Study TypeScript fundamentals, focusing on type definitions and interfaces.",
+        "Practice explaining technical concepts clearly and concisely to build communication skills."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Hi. Thanks for joining today. I'll be running your frontend engineering interview. We'll go over some React, TypeScript, and UI topics ready to dive in?",
+          "candidateAnswer": "Yes, I’m excited and ready to discuss frontend topics.",
+          "score": 70,
+          "feedback": "Good enthusiasm to begin the interview. It sets a positive tone for the conversation."
+        }
+      ]
+    }
+  },
+  {
+    "id": "6dfff5ff-e602-4a7b-b5a1-6968be180948",
+    "date": "2026-03-29T20:12:49.139Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 10,
+      "communication": 15,
+      "technicalAccuracy": 0,
+      "problemSolving": 5,
+      "strengths": [
+        "The candidate attempted to engage the interviewer, albeit off-topic.",
+        "The candidate showed some self-awareness by stating they might not do the whole thing.",
+        "Demonstrated willingness to discuss their thoughts, although they weren't relevant."
+      ],
+      "improvements": [
+        "Stay on topic: The candidate continually veered off from the merge intervals problem.",
+        "Clarity of thoughts: The candidate’s answers were often not coherent or relevant to the question.",
+        "Structure: The candidate did not outline any concrete approach to the problem as requested."
+      ],
+      "nextSteps": [
+        "Practice coding problems consistently to develop technical skills.",
+        "Work on communication skills to convey ideas more clearly and focus on the given topic.",
+        "Engage in mock interviews to simulate real interview conditions and learn to stay focused."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "What's your initial approach to the merge intervals problem?",
+          "candidateAnswer": "I'm not gonna do the whole thing.",
+          "score": 5,
+          "feedback": "The candidate failed to provide a structured or relevant response to the question, indicating a lack of focus and understanding of the task."
+        },
+        {
+          "question": "Please outline your approach.",
+          "candidateAnswer": "I know. Maybe don't tell me what to do.",
+          "score": 0,
+          "feedback": "The response was dismissive and did not reflect any technical content or a structured approach to problem-solving."
+        }
+      ]
+    }
+  },
+  {
+    "id": "d12d7738-e1b6-4c96-9a0d-96d10cc02bf1",
+    "date": "2026-03-29T20:10:42.036Z",
+    "role": "mobile",
+    "questionType": "behavioral",
+    "config": {
+      "role": "mobile",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 45,
+      "communication": 50,
+      "technicalAccuracy": 40,
+      "problemSolving": 45,
+      "strengths": [
+        "The candidate demonstrates willingness to engage in the interview process.",
+        "Mentioned a relevant project involving React Native, showing some familiarity with the framework.",
+        "Indicated understanding of data handling in mobile apps, albeit briefly."
+      ],
+      "improvements": [
+        "Candidate struggled to articulate their thoughts clearly and concisely, as seen in their hesitations and incomplete sentences.",
+        "Could not provide specific details on how React Native was utilized, which is critical for a technical discussion.",
+        "Lacked familiarity with specific libraries or patterns within React Native, indicating a gap in depth of knowledge."
+      ],
+      "nextSteps": [
+        "Practice articulating project experiences in detail, focusing on specific technologies and methodologies used.",
+        "Deepen knowledge of React Native, particularly its libraries and common patterns to improve technical discussions.",
+        "Engage in mock interviews to enhance communication skills and receive constructive feedback."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you built a feature where React Native helped you solve a problem. What was the feature and how did React Native help?",
+          "candidateAnswer": "I used it to create a pipeline to dive into a dataset to help pull up information for a medical lab. It was it was quite useful.",
+          "score": 40,
+          "feedback": "The answer is very vague and lacks specific details about what the feature was, how React Native was specifically beneficial, or what challenges were faced. The candidate should work on providing clearer, more detailed answers."
+        },
+        {
+          "question": "Can you tell me more about how you used React Native in that project? For example, did you use any libraries or patterns to handle the data or display it in the app?",
+          "candidateAnswer": "I just I have reasoning patterns to help display the data and",
+          "score": 30,
+          "feedback": "The response is incomplete and does not answer the question adequately. The candidate should work on providing specific examples and discussing the libraries or design patterns used in their project."
+        }
+      ]
+    }
+  },
+  {
+    "id": "54e0fdb6-d138-4af5-af8d-70fdd4e2cc2d",
+    "date": "2026-03-29T19:57:02.653Z",
+    "role": "ml",
+    "questionType": "technical",
+    "config": {
+      "role": "ml",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 55,
+      "communication": 65,
+      "technicalAccuracy": 45,
+      "problemSolving": 50,
+      "strengths": [
+        "Attempted to engage with the problem actively, showing willingness to participate.",
+        "Expressed readiness to read through the problem, which indicates a thoughtful and careful approach.",
+        "Used proactive language like 'let's get started,' which can build rapport."
+      ],
+      "improvements": [
+        "Could have provided a more structured thought process when approaching the problem, such as breaking down the problem into smaller parts.",
+        "Need to work on articulating initial thoughts without hesitation, other than 'Actually, has it.'",
+        "Should focus on improving technical terminology related to algorithms and data structures for clarity."
+      ],
+      "nextSteps": [
+        "Practice explaining coding problems out loud to build confidence and clarity in communication.",
+        "Work on simple coding problems related to intervals and sorting to improve technical knowledge.",
+        "Join coding interview preparation platforms to familiarize with common interview patterns and improve problem-solving skills."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the merge intervals problem in front of you. Take a moment to read through it, when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "Actually, has it.",
+          "score": 30,
+          "feedback": "The response was unclear and did not demonstrate any thought process regarding the problem. The candidate should aim to generate initial thoughts proactively."
+        }
+      ]
+    }
+  },
+  {
+    "id": "6ebc0862-982b-4b49-910e-89d8a553f14a",
+    "date": "2026-03-29T19:55:41.365Z",
+    "role": "backend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "backend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 55,
+      "communication": 60,
+      "technicalAccuracy": 65,
+      "problemSolving": 50,
+      "strengths": [
+        "Knowledge of basic concepts - The candidate showed an understanding of a to-do app's purpose and basic endpoint requirements.",
+        "Willingness to engage - The candidate was eager to begin the interview and participate in the discussion.",
+        "Open about their thought process - The candidate expressed hesitation, which is a sign of careful consideration."
+      ],
+      "improvements": [
+        "Clarity of expression - The candidate's hesitations ('There's a lot of...') made it difficult to follow their thought process.",
+        "Depth of technical content - The candidate provided surface-level insights with no specific examples or details of API endpoints.",
+        "Structured problem-solving approach - The candidate did not outline a systematic approach to designing the API."
+      ],
+      "nextSteps": [
+        "Practice articulating ideas more clearly to improve communication skills.",
+        "Study the RESTful API design principles and common CRUD operations.",
+        "Work on mock interview scenarios to build confidence in expressing their thought processes."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Imagine you need to design an API for a to do app.",
+          "candidateAnswer": "Oh, there's a lot of...",
+          "score": 40,
+          "feedback": "The candidate's answer lacked structure and depth. They did not provide a specific outline of the API structure or endpoints, which is essential for such a question. Clarity and thoroughness would greatly improve their response."
+        }
+      ]
+    }
+  },
+  {
+    "id": "768911a0-e9f8-44e8-97d3-8714f8310f32",
+    "date": "2026-03-29T19:52:40.858Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 30,
+      "communication": 40,
+      "technicalAccuracy": 20,
+      "problemSolving": 25,
+      "strengths": [
+        "The candidate shows an eagerness to engage by asking 'Can I join?' which indicates willingness to participate.",
+        "They begin to express a thought process ('Yeah') when approached with the problem, showcasing a step towards verbalizing their ideas."
+      ],
+      "improvements": [
+        "The candidate struggled to articulate their thoughts clearly, often trailing off or not directly addressing the question asked by the interviewer.",
+        "The lack of clarity and focus on the problem ('What is it?') suggests insufficient preparedness for technical questions.",
+        "The response did not indicate any specific technical knowledge or frameworks related to the coding problem, reflecting a need for foundational knowledge in coding interviews."
+      ],
+      "nextSteps": [
+        "Study the merge intervals problem and similar algorithm challenges on platforms like LeetCode or HackerRank to develop problem-solving skills.",
+        "Practice clear communication and structured responses by summarizing thoughts before speaking during mock interviews.",
+        "Review basic concepts in JavaScript or relevant frontend technologies to increase confidence and technical knowledge."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the merge intervals problem in front of you. Take a moment to read through it. When you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "The candidate asked 'Can I join?' and then expressed confusion with 'What is it?'",
+          "score": 20,
+          "feedback": "The candidate did not articulate any initial thoughts or strategies regarding the merge intervals problem, indicating a lack of clarity in understanding the problem at hand. A better approach would have been to summarize the problem and outline a plan to tackle it."
+        }
+      ]
+    }
+  },
+  {
+    "id": "ecb79f58-71cc-43ad-96ca-31060513c6ba",
+    "date": "2026-03-29T19:51:30.745Z",
+    "role": "security",
+    "questionType": "behavioral",
+    "config": {
+      "role": "security",
+      "difficulty": 100,
+      "experienceLevel": 3,
+      "strictness": 100,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 45,
+      "communication": 60,
+      "technicalAccuracy": 40,
+      "problemSolving": 50,
+      "strengths": [
+        "Willingness to participate actively, demonstrated by saying 'Start' and 'What's the first question?'",
+        "Acknowledged the complexity of debugging software issues, showing recognition of challenges in the field.",
+        "Provided a real experience, which indicates some practical exposure to software issues."
+      ],
+      "improvements": [
+        "Lacked specific technical details about the debugging process; candidate could improve by explaining tools or methods used.",
+        "Did not articulate the final outcome of the debugging experience clearly, which is crucial for demonstrating problem-solving skills.",
+        "Struggled to maintain clarity and conciseness in their initial responses, leading to potential misunderstandings."
+      ],
+      "nextSteps": [
+        "Practice articulating experiences using the STAR (Situation, Task, Action, Result) method for behavioral questions.",
+        "Explore common debugging tools and techniques and incorporate specific examples in future interviews.",
+        "Work on clear and concise communication strategies, focusing on structuring answers to highlight key points first."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you had to debug a complex software issue.",
+          "candidateAnswer": "The candidate recounted an experience but did not provide strong technical details or a conclusive resolution.",
+          "score": 40,
+          "feedback": "While the candidate mentioned an experience, they did not delve into the specifics of the debugging techniques or tools used. The response lacked clarity on the problem and the outcome, making it harder to assess their problem-solving skills effectively."
+        }
+      ]
+    }
+  },
+  {
+    "id": "9cbe27e5-632a-46b1-9ff4-9f4163e8fda8",
+    "date": "2026-03-29T19:47:36.592Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 21,
+      "experienceLevel": 1,
+      "strictness": 5,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 30,
+      "communication": 40,
+      "technicalAccuracy": 20,
+      "problemSolving": 30,
+      "strengths": [
+        "Positive attitude: The candidate expresses enthusiasm with phrases like 'That's really good.'",
+        "Willingness to engage: The candidate responds promptly, indicating readiness."
+      ],
+      "improvements": [
+        "Lack of clarity: The candidate's answer was vague and did not explain what React is or its purpose.",
+        "Need for more structure: The candidate's response lacked a logical flow, which is important in technical discussions.",
+        "Technical knowledge gap: The candidate did not provide any specifics about React, which is expected at this level."
+      ],
+      "nextSteps": [
+        "Study React fundamentals: Focus on React components, state, and props to build a foundational understanding.",
+        "Practice clear communication: Prepare concise definitions and explanations for basic concepts in frontend development.",
+        "Engage in mock interviews: Simulate interview scenarios to boost confidence and improve articulation."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Can you tell me what React is and why developers use it?",
+          "candidateAnswer": "The candidate acknowledged the question but did not provide a clear answer about React.",
+          "score": 20,
+          "feedback": "The candidate needed to demonstrate a basic understanding of React, including its main features and why it is popular among developers. A more structured and detailed response was expected."
+        }
+      ]
+    }
+  },
+  {
+    "id": "c06e8c27-3041-4918-be15-dd3a7ab39991",
+    "date": "2026-03-29T19:36:07.994Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 35,
+      "communication": 40,
+      "technicalAccuracy": 30,
+      "problemSolving": 25,
+      "strengths": [
+        "Asked clarifying questions, demonstrating engagement, e.g., 'What's an anagram?'",
+        "Displayed willingness to learn, e.g., 'That's so cool.'",
+        "Attempted to connect ideas, hinting at understanding of the problem."
+      ],
+      "improvements": [
+        "Lacked clarity in initial response, not addressing the problem directly.",
+        "Failed to articulate a clear plan for the coding challenge, saying 'I want you to really talk to it.'",
+        "Did not demonstrate foundational knowledge of anagrams, needing explanation from the interviewer."
+      ],
+      "nextSteps": [
+        "Study basic data structures and algorithms, particularly string manipulation.",
+        "Practice problem-solving with preparation platforms like LeetCode or HackerRank.",
+        "Review concepts of anagrams and similar string problems to build confidence."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "I want you to really talk to it.",
+          "score": 30,
+          "feedback": "The response was vague and did not show any direction or initial thought about the problem."
+        },
+        {
+          "question": "Where were you in your solution?",
+          "candidateAnswer": "What's an anagram?",
+          "score": 20,
+          "feedback": "Demonstrated lack of basic understanding of the problem, which is fundamental at a junior level."
+        },
+        {
+          "question": "How do you think you could check if 2 words are anagrams in code?",
+          "candidateAnswer": "Checking if they have the same letters.",
+          "score": 35,
+          "feedback": "Started to grasp the check needed, but lacked detail in implementation and did not suggest sorting or counting letters."
+        }
+      ]
+    }
+  },
+  {
+    "id": "70373d6b-3757-4a94-8dca-955ee157c1b1",
+    "date": "2026-03-29T19:33:50.489Z",
+    "role": "mobile",
+    "questionType": "behavioral",
+    "config": {
+      "role": "mobile",
+      "difficulty": 100,
+      "experienceLevel": 3,
+      "strictness": 100,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 35,
+      "communication": 40,
+      "technicalAccuracy": 30,
+      "problemSolving": 30,
+      "strengths": [
+        "Candidate attempted to address the initial question with initiative.",
+        "Showed willingness to participate before being redirected.",
+        "Displayed interest in the topic of debugging React Native apps."
+      ],
+      "improvements": [
+        "Need to provide clear and structured answers rather than vague statements.",
+        "Inability to articulate specific debugging experiences or methods.",
+        "Lack of relevant technical knowledge on React Native debugging strategies."
+      ],
+      "nextSteps": [
+        "Study common debugging techniques in React Native applications.",
+        "Practice structuring answers to behavioral questions using the STAR method (Situation, Task, Action, Result).",
+        "Familiarize with specific tools and libraries used in mobile application development."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you had to debug a tricky issue in a React Native app. What steps did you take to find and fix the problem?",
+          "candidateAnswer": "Candidate did not provide a clear answer or relevant example related to debugging.",
+          "score": 20,
+          "feedback": "The candidate failed to answer the question regarding specific steps taken in debugging. There was no example shared that related to React Native, which is crucial for the role. This indicates a lack of experience in this area, and communication was unclear."
+        }
+      ]
+    }
+  },
+  {
+    "id": "bd24f0cb-3147-4602-a1dd-e2ba21f0d307",
+    "date": "2026-03-29T19:30:13.644Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 40,
+      "communication": 30,
+      "technicalAccuracy": 20,
+      "problemSolving": 40,
+      "strengths": [
+        "Attempted to engage with the interviewer by suggesting an alternative communication method, demonstrating willingness to collaborate."
+      ],
+      "improvements": [
+        "Struggled with clarity and articulation, often trailing off without finishing thoughts as seen when they said, 'it can tie it can talk.'",
+        "Failed to provide relevant thoughts on the problem statement, indicating a lack of understanding of the task.",
+        "Lacked structured thought process in answering initial questions, which could lead to confusion."
+      ],
+      "nextSteps": [
+        "Practice coding challenges on platforms like LeetCode or CodeSignal specifically focusing on string and array manipulations.",
+        "Work on explaining thought processes during coding practice to improve communication skills.",
+        "Study the concept of anagrams and explore different methods to group them effectively, such as sorting or using a hash map."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the group anagrams problem in front of you? Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "Suggested alternative communication methods and asked about the opportunity for follow-up questions.",
+          "score": 15,
+          "feedback": "The candidate did not provide any relevant thoughts on the problem at hand. Their answer indicated a lack of focus on the task, which is crucial at this stage in a technical interview."
+        }
+      ]
+    }
+  },
+  {
+    "id": "0a9f746e-9a2a-41a0-92cf-6be0bda83466",
+    "date": "2026-03-29T19:28:07.979Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 1,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 65,
+      "communication": 70,
+      "technicalAccuracy": 60,
+      "problemSolving": 65,
+      "strengths": [
+        "Showed eagerness and readiness to engage with questions: 'Yeah, I'm ready.'",
+        "Demonstrated basic understanding of React concepts by being aware of state management in components.",
+        "Attempted to explain a component they built, indicating practical experience."
+      ],
+      "improvements": [
+        "Lacked specificity in explaining the component and user input handling.",
+        "Failed to clearly articulate the setup of the component, making it hard to understand their approach.",
+        "Could improve on clarity by providing structured responses with examples."
+      ],
+      "nextSteps": [
+        "Review React documentation, particularly focusing on state management and user input handling.",
+        "Practice explaining projects in more detail, focusing on structured storytelling.",
+        "Engage in coding exercises that involve building components to reinforce conceptual knowledge."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time when you built a component that had to handle user input and update state. What was the situation, and how did you set up the component?",
+          "candidateAnswer": "So that we would...",
+          "score": 50,
+          "feedback": "The candidate started to answer but did not complete their thought, leaving the response vague and incomplete. Additional context and a clear description of the component's functionality and setup process were needed to demonstrate competence in handling user inputs."
+        }
+      ]
+    }
+  },
+  {
+    "id": "f46eabee-aff6-4974-a0c3-1fb2e0340ef6",
+    "date": "2026-03-29T19:22:07.028Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 40,
+      "communication": 30,
+      "technicalAccuracy": 20,
+      "problemSolving": 35,
+      "strengths": [
+        "Shows willingness to engage with the problem",
+        "Attempted to convey an understanding of coding process",
+        "Recognizes need for testing code"
+      ],
+      "improvements": [
+        "Lacked clarity in articulating thought process; responses were vague (e.g., 'Basic.')",
+        "Provided minimal technical content, lacking specific examples or definitions",
+        "Did not propose any concrete steps or solutions to the problem presented"
+      ],
+      "nextSteps": [
+        "Practice explaining coding solutions out loud to improve communication skills",
+        "Study common algorithm problems like 'group anagrams' and practice coding them",
+        "Review basic concepts in data structures and algorithms to build technical foundation"
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the group anagrams problem in front of you? Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "Basic. So you'd write the code here and then you run the tests, and, uh, it actually shows you.",
+          "score": 30,
+          "feedback": "The answer was too vague and lacked depth. While the candidate acknowledged the need to write and test code, they did not provide any specific approach or insight into the actual problem. This lacked the clarity and technical detail expected for a coding problem discussion."
+        }
+      ]
+    }
+  },
+  {
+    "id": "8c4fa80e-3069-4eb8-8b98-dcbe989d68e3",
+    "date": "2026-03-29T19:19:54.017Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 60,
+      "communication": 65,
+      "technicalAccuracy": 70,
+      "problemSolving": 55,
+      "strengths": [
+        "Enthusiastic and confident demeanor during the introduction.",
+        "Showed basic understanding of React and TypeScript frameworks.",
+        "Mentioned collaboration with team members while implementing changes."
+      ],
+      "improvements": [
+        "Lack of specific details on the process of adding a prop to a component.",
+        "Need to clarify challenges faced and how they were overcome.",
+        "Could improve articulation of technical concepts to enhance clarity."
+      ],
+      "nextSteps": [
+        "Practice explaining coding processes in detail to enhance clarity.",
+        "Engage in projects that require adding props in TypeScript and React for hands-on experience.",
+        "Review common challenges in React and TypeScript integration to anticipate issues."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you added a TypeScript prop to a React component. What steps did you take and what challenges did you face?",
+          "candidateAnswer": "I remember working on a project where I needed to add a new prop to a component. First, I looked at the existing code, then I added the prop in TypeScript and made sure to update the component accordingly. I did face some challenge with types but sorted it out with my teammates.",
+          "score": 65,
+          "feedback": "The candidate demonstrated a basic understanding of the process but lacked depth in explaining the steps and difficulties faced. More specificity regarding the challenges and how they were navigated would have improved the answer."
+        }
+      ]
+    }
+  },
+  {
+    "id": "5f2a9602-8d45-43b7-bf02-086ae2e3e8a1",
+    "date": "2026-03-29T18:48:48.060Z",
+    "role": "backend",
+    "questionType": "technical",
+    "config": {
+      "role": "backend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 25,
+      "communication": 30,
+      "technicalAccuracy": 20,
+      "problemSolving": 15,
+      "strengths": [
+        "Attempted to engage with the problem, indicating familiarity with coding challenges.",
+        "Used some relevant terminology like 'merge intervals' which shows understanding of the topic."
+      ],
+      "improvements": [
+        "Struggled to articulate thoughts clearly; responses were vague and hard to follow.",
+        "Failed to provide a structured approach to the problem, lacking a clear problem-solving strategy.",
+        "There were multiple interruptions in thought, which made explanations unclear."
+      ],
+      "nextSteps": [
+        "Practice coding problems on platforms like LeetCode or HackerRank, focusing on problem descriptions and structured responses.",
+        "Engage in mock interviews to improve verbal articulation and confidence during technical discussions.",
+        "Review fundamental data structures and algorithms, especially understanding how they apply to interval merging problems."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "How are you thinking about starting? What's your approach for the merge intervals problem?",
+          "candidateAnswer": "The candidate gave vague and fragmented thoughts without a clear structured approach.",
+          "score": 20,
+          "feedback": "The candidate failed to communicate a coherent method for addressing the merge intervals problem, demonstrating uncertainty and lack of preparation."
+        }
+      ]
+    }
+  },
+  {
+    "id": "61ae671c-8605-481b-88bb-d8a701efbe21",
+    "date": "2026-03-29T18:46:46.528Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 70,
+      "experienceLevel": 1,
+      "strictness": 62,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 55,
+      "communication": 60,
+      "technicalAccuracy": 65,
+      "problemSolving": 50,
+      "strengths": [
+        "Identified key issue in a React application related to REST calls.",
+        "Demonstrated a methodical approach to debugging using logs.",
+        "Mentioned working on a relevant project, showing some practical experience."
+      ],
+      "improvements": [
+        "Clarify technical terms; the term 'SSC connection' could be confusing.",
+        "Expand on methodologies; provide more detail on specific React Debugging tools used.",
+        "Improve articulation by reducing filler words like 'you know' and 'basically' for smoother communication."
+      ],
+      "nextSteps": [
+        "Study common debugging tools in React such as React DevTools.",
+        "Practice explaining technical problems clearly with structured answers.",
+        "Engage in peer coding sessions to enhance communication and technical understanding."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you had to debug an issue in a React application. What was the problem, and how did you figure it out?",
+          "candidateAnswer": "The candidate described debugging a stock aggregate platform where certain stocks were not displaying correctly due to REST calls made after the connection.",
+          "score": 60,
+          "feedback": "While the candidate identified a critical issue related to REST calls, their explanation lacked clarity regarding the debugging process and specific tools used. More thorough articulation and detail would enhance understanding."
+        }
+      ]
+    }
+  },
+  {
+    "id": "7fbece9d-6c56-4031-90a5-518727f92e6a",
+    "date": "2026-03-29T17:53:35.090Z",
+    "role": "backend",
+    "questionType": "technical",
+    "config": {
+      "role": "backend",
+      "difficulty": 100,
+      "experienceLevel": 0,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 20,
+      "communication": 25,
+      "technicalAccuracy": 10,
+      "problemSolving": 15,
+      "strengths": [
+        "Showed willingness to engage with the problem by saying 'Interesting.'",
+        "Attempted to read through the problem."
+      ],
+      "improvements": [
+        "Lacked clarity in communicating initial thoughts.",
+        "Did not provide a structured approach to the problem.",
+        "Used vague expressions like 'Interesting' without further elaborating."
+      ],
+      "nextSteps": [
+        "Practice explaining thought processes out loud during problems.",
+        "Work on breaking down problems into smaller parts and articulating them clearly.",
+        "Study the algorithm for finding the median of two sorted arrays, including edge cases."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the median of 2 sorted arrays problem in front of you, take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "The input dose keeps speaking to you. Interesting. Interesting. It looks",
+          "score": 15,
+          "feedback": "The candidate struggled to articulate their thoughts clearly. While they showed some attempt to engage with the problem, their answer was vague and lacked a clear structure. A more detailed breakdown of their understanding and approach would have improved their score."
+        }
+      ]
+    }
+  },
+  {
+    "id": "a8d5cca7-37a2-4c1f-960d-c8d787b73d9d",
+    "date": "2026-03-29T17:52:50.123Z",
+    "role": "backend",
+    "questionType": "technical",
+    "config": {
+      "role": "backend",
+      "difficulty": 100,
+      "experienceLevel": 0,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 35,
+      "communication": 40,
+      "technicalAccuracy": 20,
+      "problemSolving": 30,
+      "strengths": [
+        "Attempts to engage with the interviewer by asking about available tools such as the compiler.",
+        "Shows willingness to clarify understanding of the problem.",
+        "Initiates the coding portion with some level of thought process."
+      ],
+      "improvements": [
+        "Lacks clarity and coherence in explaining initial thoughts on the LRU cache problem, making it difficult to follow.",
+        "Uses repetitive phrases such as 'And And it's asking you to learn to...', which detracts from communication effectiveness.",
+        "Demonstrates confusion about the problem statement without providing any detailed plan or breakdown of how to approach solving it."
+      ],
+      "nextSteps": [
+        "Practice articulating thoughts in a structured manner, possibly using the STAR method (Situation, Task, Action, Result).",
+        "Work on common data structure problems like LRU Cache and clearly outline your thought process before coding.",
+        "Engage in mock interviews focusing on both technical and communication skills to receive feedback."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the LRU cache problem in front of you. Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "The candidate expressed confusion about the problem by saying, 'So it gives you the leak code problem. And And it's asking you to learn to.' Additionally, asked if a compiler was available.",
+          "score": 20,
+          "feedback": "The candidate's response lacked clarity and coherence, making it difficult to grasp their understanding of the LRU cache problem. Additionally, the focus on a compiler rather than the problem itself indicates a need for stronger technical preparation."
+        }
+      ]
+    }
+  },
+  {
+    "id": "39defa9b-b5a0-48d6-8de3-6e145d6073fc",
+    "date": "2026-03-29T17:50:26.333Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 35,
+      "communication": 40,
+      "technicalAccuracy": 30,
+      "problemSolving": 35,
+      "strengths": [
+        "Enthusiastic demeanor: The candidate expressed eagerness to start the interview with 'Let's do it.'",
+        "Basic understanding of teamwork: Mentioned working as part of a team, indicating some level of collaboration experience."
+      ],
+      "improvements": [
+        "Clarity in responses: The candidate's answer was unclear and disjointed, indicating difficulty in articulating thoughts.",
+        "Detail orientation: Lacked specific examples of technical challenges faced, diminishing the depth of their answer.",
+        "Ability to elaborate: The candidate did not expand on their role within the team or the complexities faced, which are crucial for a behavioral question."
+      ],
+      "nextSteps": [
+        "Practice articulating personal experiences in a structured manner, focusing on specific roles and challenges.",
+        "Study common React projects and their complexities to be able to discuss them in interviews.",
+        "Engage in mock interviews to build confidence and improve clarity in responses."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you worked on a team project using React. What was your role, and what technical challenges did you face?",
+          "candidateAnswer": "We wanted to go in, but I guess change the complexity make it harder?",
+          "score": 30,
+          "feedback": "The candidate's response was vague and lacked structure. They did not clearly define their role or the specific challenges faced during the project. It would be beneficial for them to provide more detailed examples and articulate them better."
+        }
+      ]
+    }
+  },
+  {
+    "id": "c9b0498e-5af6-4161-a33e-3e875ec355a2",
+    "date": "2026-03-29T17:41:37.190Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 40,
+      "communication": 45,
+      "technicalAccuracy": 40,
+      "problemSolving": 45,
+      "strengths": [
+        "Basic understanding of user input management in components.",
+        "Experience with building components, indicating some practical exposure."
+      ],
+      "improvements": [
+        "Lack of detail in explaining state management techniques, such as useState or Context API.",
+        "Struggled to stay focused and articulate thoughts clearly during responses."
+      ],
+      "nextSteps": [
+        "Study detailed examples of state management in React, specifically useState and useEffect.",
+        "Practice explaining projects and components in more structured responses to boost articulation.",
+        "Work on common React interview questions to enhance understanding and organization of answers."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you built a component that needed to handle user input.",
+          "candidateAnswer": "I was building the voice AI interview performer and it worked very efficiently.",
+          "score": 40,
+          "feedback": "The candidate started strong but did not elaborate on how user input was managed or what specific approaches were used, which is critical for the question."
+        },
+        {
+          "question": "Can you talk through how you handled user's input inside your component?",
+          "candidateAnswer": "Okay. I want 6.",
+          "score": 30,
+          "feedback": "The response was not clear or relevant to the question asked. It did not demonstrate any understanding of input handling in React."
+        }
+      ]
+    }
+  },
+  {
+    "id": "30855d80-62b1-40c8-a2c1-1d4747c3896a",
+    "date": "2026-03-29T17:18:21.401Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 45,
+      "communication": 50,
+      "technicalAccuracy": 40,
+      "problemSolving": 35,
+      "strengths": [
+        "Initiated the problem-solving process, indicating openness to thinking through the problem.",
+        "Displayed a basic understanding of the problem set-up by acknowledging the task.",
+        "Showed willingness to engage with the interviewer, suggesting an eagerness to participate."
+      ],
+      "improvements": [
+        "Lacked detail in explaining initial thoughts, which made it hard to gauge understanding (only said 'I just have to work on').",
+        "Did not clearly articulate a structured approach to solving the problem, which is necessary for the coding section.",
+        "Missed out on discussing potential edge cases or considerations for the solution."
+      ],
+      "nextSteps": [
+        "Practice explaining thought processes during coding challenges to improve clarity.",
+        "Study common algorithms and data structures, particularly focusing on string manipulation techniques suitable for solving similar problems.",
+        "Work on mock coding interviews to build confidence in articulating code solutions."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the group anagrams problem in front of you? Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "I just have to work on.",
+          "score": 30,
+          "feedback": "The candidate did not provide a thoughtful or detailed response. There was no clear communication of their understanding of the problem or their approach to a solution. Important to elaborate on this in interviews."
+        }
+      ]
+    }
+  },
+  {
+    "id": "f4f4942f-cfb1-4d96-8597-829c7a163c91",
+    "date": "2026-03-29T17:16:21.438Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 55,
+      "communication": 60,
+      "technicalAccuracy": 50,
+      "problemSolving": 50,
+      "strengths": [
+        "Candidate shows enthusiasm when discussing past projects.",
+        "Ability to articulate their learning journey in frontend technologies.",
+        "Demonstrates a foundational understanding of basic HTML/CSS concepts."
+      ],
+      "improvements": [
+        "Needs more detail in technical explanations, such as specific frameworks used.",
+        "Could improve on providing structured answers to behavioral questions.",
+        "Should work on connecting previous experiences to the role more clearly."
+      ],
+      "nextSteps": [
+        "Practice articulating specific examples from past projects with details.",
+        "Engage in mock interviews to refine communication skills.",
+        "Study common frontend frameworks and their applications to enhance technical knowledge."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Can you tell me about a project you worked on and your role in it?",
+          "candidateAnswer": "I worked on a website for a local business, where I did some coding.",
+          "score": 50,
+          "feedback": "The candidate provided a very brief response without much detail about their specific contributions or technologies used."
+        },
+        {
+          "question": "How do you ensure your code is maintainable?",
+          "candidateAnswer": "I try to comment my code and keep it organized.",
+          "score": 60,
+          "feedback": "The candidate mentioned commenting and organization, but could benefit from discussing best practices or specific techniques more in-depth."
+        },
+        {
+          "question": "Describe a challenge you faced in your work and how you overcame it.",
+          "candidateAnswer": "I once had trouble with a bug, and I just tried to fix it by looking online and asking friends.",
+          "score": 40,
+          "feedback": "While the candidate identified a challenge, the answer lacked depth in terms of the specific challenge and how problem-solving skills were applied."
+        }
+      ]
+    }
+  },
+  {
+    "id": "ee5d3dba-36c9-4679-80b1-119f9c8bb052",
+    "date": "2026-03-29T16:58:28.548Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 40,
+      "communication": 50,
+      "technicalAccuracy": 40,
+      "problemSolving": 45,
+      "strengths": [
+        "Attempted to discuss a real-world experience with React.",
+        "Identified a specific problem (incorrect API routes) related to a feature (voice API).",
+        "Demonstrated a basic understanding of API integration."
+      ],
+      "improvements": [
+        "Struggled to articulate a coherent narrative; answers were fragmented.",
+        "Lacked depth in explaining how the problem was resolved.",
+        "Could not clearly state the impact of the fix or lessons learned."
+      ],
+      "nextSteps": [
+        "Practice structuring answers using the STAR method (Situation, Task, Action, Result).",
+        "Engage in mock interviews to improve clarity and confidence.",
+        "Study common React pitfalls and how to resolve them, focusing on debugging techniques."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you fixed a bug in a React app. What was the problem and how did you solve it?",
+          "candidateAnswer": "The candidate mentioned fixing a bug with a voice API related to text to speech and speech to text where the routing was incorrect.",
+          "score": 40,
+          "feedback": "The answer lacked clarity and depth. While the candidate identified a problem, they did not explain how they fixed the bug or the results of their actions, which is critical for demonstrating problem-solving abilities."
+        }
+      ]
+    }
+  },
+  {
+    "id": "f1e6ed4a-2ed0-4094-89b1-8cad193390a6",
+    "date": "2026-03-29T14:47:08.090Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 40,
+      "communication": 50,
+      "technicalAccuracy": 40,
+      "problemSolving": 45,
+      "strengths": [
+        "Shows willingness to tackle the problem - The candidate expresses readiness to start with 'K. Sounds good.'",
+        "Attempted to communicate solution approach - The candidate begins to share their thought process regarding the solution."
+      ],
+      "improvements": [
+        "Lacks clarity in explanation - The candidate's response is fragmented, making it difficult for the interviewer to follow.",
+        "Not demonstrating structured problem-solving - The candidate jumps into running the code without clearly outlining their approach to the problem.",
+        "Inadequate elaboration on solution - The candidate just says 'I can run it' without specific details on how they would solve the problem."
+      ],
+      "nextSteps": [
+        "Practice explaining solutions out loud and clearly - Work on turning thoughts into structured verbal communication.",
+        "Review common coding interview problems - Focus on basic algorithms such as 2-sum, including examples of optimal solutions.",
+        "Develop debugging skills - Run through code examples, ensuring clarity on steps taken and logic applied."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the 2 sum problem in front of you. Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "K. Sounds good. So here's my solution for the 2 sum. I can run it.",
+          "score": 30,
+          "feedback": "The candidate's initial answer lacks structure and detail. They should have first restated the problem or outlined their approach before jumping straight to running the code. It's crucial to articulate all thought processes clearly, especially in coding interviews."
+        }
+      ]
+    }
+  },
+  {
+    "id": "6d2beaee-5ea4-48ce-893a-ddf78816bc15",
+    "date": "2026-03-29T14:46:12.704Z",
+    "role": "frontend",
+    "questionType": "behavioral",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "behavioral"
+    },
+    "result": {
+      "score": 55,
+      "communication": 60,
+      "technicalAccuracy": 50,
+      "problemSolving": 55,
+      "strengths": [
+        "Demonstrated basic understanding of React components and routing.",
+        "Ability to identify a problem with navigation, which is crucial for user experience.",
+        "Showed a willingness to explain the debugging process."
+      ],
+      "improvements": [
+        "The candidate's initial explanation was vague and lacked detail about the debugging process.",
+        "Could provide clearer examples of how they identified the routing issue.",
+        "Need to practice articulating technical challenges more effectively to convey understanding."
+      ],
+      "nextSteps": [
+        "Study common React debugging techniques and practice articulating the process.",
+        "Work on building a small React project incorporating routing and intentionally introduce bugs to practice debugging.",
+        "Participate in mock interviews to practice verbalizing problem-solving methods."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Tell me about a time you had to debug a React component that was not working as expected. What was the issue and how did you find the root cause?",
+          "candidateAnswer": "The issue was using the wrong routing for one of our APIs, and we had to fix it to ensure the right routes for navigation.",
+          "score": 50,
+          "feedback": "While the candidate identified an issue related to routing, they did not provide sufficient detail on how they diagnosed the problem or what steps were taken to resolve it. Encouraged to elaborate on processes and techniques used in debugging."
+        }
+      ]
+    }
+  },
+  {
+    "id": "629ce953-c576-41f0-853e-0618a308c049",
+    "date": "2026-03-29T14:33:19.310Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 65,
+      "communication": 70,
+      "technicalAccuracy": 60,
+      "problemSolving": 65,
+      "strengths": [
+        "Demonstrated understanding of problem requirements by acknowledging the need to combine overlapping intervals.",
+        "Attempted to articulate a plan, indicating a basic understanding of algorithms.",
+        "Expressed willingness to think through the problem, which shows a proactive attitude."
+      ],
+      "improvements": [
+        "Failed to clearly outline a structured approach to code, lacking detailed steps on how to solve the merge intervals problem.",
+        "Struggled with terminology, such as incorrectly referring to intervals as 'arrays' instead of 'intervals.'",
+        "Did not sufficiently break down the problem into smaller parts, missing an opportunity to clarify the approach to the interviewer."
+      ],
+      "nextSteps": [
+        "Practice solving basic algorithm problems, focusing on interval-related challenges to build confidence.",
+        "Work on articulating problem-solving approaches clearly to ensure comprehension in interviews.",
+        "Study basic data structures and their applications to improve technical vocabulary and accuracy."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the merge intervals problem in front of you. Take a moment to read through it. When you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "I think I need to combine overlapping intervals. Like, if I have [1,3] and [2,6], I need to merge them into [1,6]. I guess I'll just sort them first then check for overlaps.",
+          "score": 65,
+          "feedback": "The candidate shows a reasonable starting point by referencing the need to combine intervals and suggesting sorting. However, the response lacks detail and clarity, especially regarding how they would check for overlaps. Encouraging the candidate to structure their thought process better would be beneficial."
+        }
+      ]
+    }
+  },
+  {
+    "id": "439e7df5-6d50-4dec-89db-b3133d35d8b7",
+    "date": "2026-03-29T14:31:04.389Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 40,
+      "communication": 30,
+      "technicalAccuracy": 50,
+      "problemSolving": 40,
+      "strengths": [
+        "Shows willingness to tackle coding problems, indicating some foundational knowledge.",
+        "References having solved similar problems before, hinting at prior experience.",
+        "Starts to engage with the problem, albeit not clearly articulating a plan."
+      ],
+      "improvements": [
+        "Struggles with clarity and fluency in communication; frequent hesitations ('I I got').",
+        "Lacks a clear and structured approach to problem-solving, failing to present initial thoughts.",
+        "Needs to improve on directly addressing the problem presented rather than deviating to past work."
+      ],
+      "nextSteps": [
+        "Practice articulating thought processes clearly when presented with coding problems.",
+        "Engage in mock interviews to build confidence and fluency in communication.",
+        "Work on solving merge intervals and similar problems on platforms like LeetCode to strengthen problem-solving skills."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Can you talk me through how you would approach merging overlapping intervals?",
+          "candidateAnswer": "That looks like Right.",
+          "score": 30,
+          "feedback": "The candidate did not provide a structured answer or specific approach. They seemed hesitant and unprepared to outline their thought process clearly."
+        }
+      ]
+    }
+  },
+  {
+    "id": "bf1675a7-138b-4b21-8d73-4e391903589f",
+    "date": "2026-03-29T14:29:46.131Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 45,
+      "communication": 40,
+      "technicalAccuracy": 30,
+      "problemSolving": 50,
+      "strengths": [
+        "Attempted to engage with the problem despite uncertainty.",
+        "Showed willingness to receive guidance from the interviewer.",
+        "Expressed understanding of needing to clarify the problem statement."
+      ],
+      "improvements": [
+        "Struggled to articulate initial thoughts clearly, often trailing off or hesitating.",
+        "Lack of familiarity with the problem hindered a structured approach.",
+        "Did not provide concrete examples or strategies for solving the problem."
+      ],
+      "nextSteps": [
+        "Practice explaining coding problems aloud to improve verbal articulation.",
+        "Study common algorithmic problems like anagrams, focusing on effective solving techniques.",
+        "Engage in mock interviews to gain confidence in answering technical questions under pressure."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "Yeah. Because I was.. I think that was too",
+          "score": 30,
+          "feedback": "The candidate struggled to express initial thoughts clearly, trailing off and exhibiting hesitation. Clear articulation is essential, especially when explaining thought processes."
+        },
+        {
+          "question": "Just talk me through what you're thinking. That is fine. Let me help clarify. For the group anagrams problem, how would you start approaching it? What comes to mind when you think about ways to group words that are anagrams at each other?",
+          "candidateAnswer": "N/A or unclear",
+          "score": 20,
+          "feedback": "The candidate did not provide a coherent response, indicating uncertainty or lack of preparation for the problem. A structured method for approaching the problem should be considered."
+        }
+      ]
+    }
+  },
+  {
+    "id": "33048edb-d28d-4d11-8166-410cb6397a40",
+    "date": "2026-03-29T14:24:33.668Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 45,
+      "communication": 60,
+      "technicalAccuracy": 50,
+      "problemSolving": 40,
+      "strengths": [
+        "Acknowledged the importance of console log for debugging, demonstrating awareness of output verification.",
+        "Brought an initial thought while discussing the problem, which shows engagement.",
+        "Participated actively when prompted by the interviewer."
+      ],
+      "improvements": [
+        "Needs to articulate and structure thoughts more clearly when explaining the problem-solving approach.",
+        "Lacked a detailed initial thought process about the '2 sum' problem, missed breaking down the problem into smaller parts.",
+        "Focus on providing complete answers rather than short fragments."
+      ],
+      "nextSteps": [
+        "Practice explaining coding problems and solutions clearly to improve communication.",
+        "Review common algorithms and problem-solving techniques like the two-pointer technique for the 'Two Sum' problem.",
+        "Work on interactive coding platforms to gain more hands-on experience and confidence."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "You've got the 2 sum problem in front of you. Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "We we still need a console log to see the result.",
+          "score": 50,
+          "feedback": "The candidate recognized the need for output verification, which is vital. However, the answer was too brief and didn't show a deep understanding of the problem itself or a structured approach to solve it."
+        }
+      ]
+    }
+  },
+  {
+    "id": "442ef507-4e72-46aa-9611-3935e88b3fcf",
+    "date": "2026-03-29T14:01:11.137Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 50,
+      "communication": 60,
+      "technicalAccuracy": 50,
+      "problemSolving": 55,
+      "strengths": [
+        "Demonstrated an understanding of the problem by summarizing it accurately.",
+        "Successfully articulated the need to group based on sorted character sequences.",
+        "Expressed willingness to work through the solution step-by-step."
+      ],
+      "improvements": [
+        "Struggled with providing a detailed algorithm initially.",
+        "Could have explained the edge cases more thoroughly.",
+        "Need to practice writing code under time pressure to improve fluidity."
+      ],
+      "nextSteps": [
+        "Practice coding problems on platforms like LeetCode or HackerRank.",
+        "Review sorting algorithms and their time complexities.",
+        "Work on verbalizing thought processes more clearly while solving problems."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Walk me through your initial thoughts on the group anagrams problem.",
+          "candidateAnswer": "Yeah.",
+          "score": 40,
+          "feedback": "The candidate provided minimal response and did not articulate their initial thoughts or approach to the problem. It would be beneficial for them to expand on their reasoning and propose a basic strategy for the solution."
+        }
+      ]
+    }
+  },
+  {
+    "id": "ec987078-f713-49cc-9b2c-8b4c4a7b67ca",
+    "date": "2026-03-29T13:23:23.519Z",
+    "role": "frontend",
+    "questionType": "technical",
+    "config": {
+      "role": "frontend",
+      "difficulty": 50,
+      "experienceLevel": 2,
+      "strictness": 50,
+      "questionType": "technical"
+    },
+    "result": {
+      "score": 50,
+      "communication": 60,
+      "technicalAccuracy": 40,
+      "problemSolving": 50,
+      "strengths": [
+        "Attempted to clarify the problem by asking relevant questions about edge cases.",
+        "Displayed a structured approach to tackling the problem by breaking it down.",
+        "Initiated problem-solving by discussing examples, which is a good way to start."
+      ],
+      "improvements": [
+        "Lacked a solid understanding of the merging logic required for intervals.",
+        "Did not efficiently convey the reasoning process throughout the explanation.",
+        "Took too long to outline a specific algorithm or pseudocode, affecting overall confidence."
+      ],
+      "nextSteps": [
+        "Review the merge intervals problem and practice implementing it in different coding languages.",
+        "Study sorting algorithms as they're often used in merge-related problems.",
+        "Engage in mock coding interviews to enhance the ability to articulate thought processes."
+      ],
+      "questionBreakdown": [
+        {
+          "question": "Take a moment to read through it, and when you're ready, walk me through your initial thoughts.",
+          "candidateAnswer": "The candidate discussed their understanding of the problem briefly but seemed unsure about the merging logic.",
+          "score": 50,
+          "feedback": "While you showed intent to clarify and break down the problem, your grasp on the solution itself was limited, affected by early hesitation and uncertainty."
+        }
+      ]
+    }
+  },
+  {
     "id": "752351e6-8ba2-4f12-a428-2c4137327107",
     "date": "2026-03-29T05:46:56.974Z",
     "role": "frontend",

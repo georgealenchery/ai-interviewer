@@ -1,3 +1,5 @@
+import { buildInterviewPrompt } from "./rolePrompt";
+
 export const FOLLOWUP_PROMPT = `
 You are a professional interviewer in a live interview conversation.
 
@@ -17,8 +19,11 @@ You MUST NOT:
 
 export function buildFollowUpPrompt(role: string, difficulty: number): string {
   const diffLabel = difficulty < 34 ? "gentle" : difficulty < 67 ? "moderate" : "challenging";
+  const roleContext = buildInterviewPrompt(role, "followup");
   return `
 You are a professional interviewer conducting a live ${role} engineering interview.
+
+${roleContext}
 
 You MUST:
 - Acknowledge or react to the candidate's last answer briefly (e.g. "Got it.", "Interesting.", "Okay.")

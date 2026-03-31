@@ -1,7 +1,19 @@
 import type { InterviewConfig, EvaluationResult } from "../types/interview";
-import type { VapiInterviewConfig } from "../hooks/useVapiInterview";
 
-const BASE_URL = "http://localhost:3001/api";
+export interface TestCase {
+  input: unknown[];
+  expectedOutput: unknown;
+  description?: string;
+}
+
+export interface CodingProblem {
+  prompt: string;
+  functionName: string;
+  functionSignature: string;
+  testCases: TestCase[];
+}
+import type { VapiInterviewConfig } from "../hooks/useVapiInterview";
+import { apiFetch } from "./auth";
 
 // ---- Vapi analysis API ----
 
@@ -30,13 +42,26 @@ export interface SavedInterview {
   result: VapiAnalysisResult;
 }
 
+export async function generateInterviewQuestions(
+  role: string,
+  difficulty: string,
+  level: string,
+): Promise<CodingProblem[]> {
+  const res = await apiFetch("/analysis/questions", {
+    method: "POST",
+    body: JSON.stringify({ role, difficulty, level }),
+  });
+  if (!res.ok) throw new Error("Failed to generate questions");
+  const data = await res.json() as { problems: CodingProblem[] };
+  return data.problems;
+}
+
 export async function evaluateVapiInterview(
   transcript: Array<{ role: string; text: string }>,
   config: VapiInterviewConfig,
 ): Promise<{ id: string; result: VapiAnalysisResult }> {
-  const res = await fetch(`${BASE_URL}/analysis/evaluate`, {
+  const res = await apiFetch("/analysis/evaluate", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ transcript, config }),
   });
   if (!res.ok) throw new Error("Failed to evaluate interview");
@@ -44,7 +69,7 @@ export async function evaluateVapiInterview(
 }
 
 export async function getInterviewHistory(): Promise<SavedInterview[]> {
-  const res = await fetch(`${BASE_URL}/analysis/history`);
+  const res = await apiFetch("/analysis/history");
   if (!res.ok) throw new Error("Failed to fetch interview history");
   const data = await res.json();
   return data.interviews;
@@ -64,9 +89,8 @@ type NextResponse =
   | { done: true; result: EvaluationResult };
 
 export async function startInterview(config: InterviewConfig): Promise<StartResponse> {
-  const res = await fetch(`${BASE_URL}/start`, {
+  const res = await apiFetch("/start", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ config }),
   });
   if (!res.ok) throw new Error("Failed to start interview");
@@ -78,9 +102,8 @@ export async function nextStep(
   step: number,
   config: InterviewConfig,
 ): Promise<NextResponse> {
-  const res = await fetch(`${BASE_URL}/next`, {
+  const res = await apiFetch("/next", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ messages, step, config }),
   });
   if (!res.ok) throw new Error("Failed to get next step");

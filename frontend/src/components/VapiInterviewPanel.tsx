@@ -37,6 +37,12 @@ export function VapiInterviewPanel() {
   } | null;
 
   const interviewer = state?.interviewer ?? "Cassidy";
+  const interviewerGradient: Record<string, string> = {
+    Cassidy: "from-purple-400 to-pink-400",
+    Alex: "from-blue-400 to-cyan-400",
+    Jordan: "from-green-400 to-emerald-400",
+  };
+  const avatarGradient = interviewerGradient[interviewer] ?? "from-purple-400 to-pink-400";
   const role = state?.role ?? "fullstack";
   const questionType = (state?.questionType ?? "behavioral") as VapiInterviewConfig["questionType"];
   const difficulty = state?.difficulty ?? 50;
@@ -50,6 +56,7 @@ export function VapiInterviewPanel() {
     experienceLevel,
     strictness,
     questionType,
+    interviewer,
   };
 
   // Timer — runs while call is active
@@ -146,7 +153,7 @@ export function VapiInterviewPanel() {
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
                 <div
-                  className="w-40 h-40 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center transition-shadow duration-300"
+                  className={`w-40 h-40 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center transition-shadow duration-300`}
                   style={isSpeaking ? { boxShadow: "0 0 40px rgba(168,85,247,0.5)" } : {}}
                 >
                   <span className="text-6xl font-bold text-white">{interviewer.charAt(0)}</span>
@@ -212,14 +219,14 @@ export function VapiInterviewPanel() {
           className="backdrop-blur-lg bg-white/5 rounded-2xl p-6 border border-white/10 shadow-xl mb-6"
         >
           <h3 className="text-sm font-medium text-gray-400 mb-4">Live Transcript</h3>
-          <div className="space-y-4 max-h-64 overflow-y-auto">
+          <div className="space-y-4 max-h-64 overflow-y-auto flex flex-col-reverse">
             {messages.length === 0 && status !== "active" && (
               <p className="text-gray-500">Click Start to begin the interview…</p>
             )}
             {messages.length === 0 && status === "active" && (
               <p className="text-gray-500 animate-pulse">Waiting for assistant…</p>
             )}
-            {messages.map((msg, i) => (
+            {[...messages].reverse().map((msg, i) => (
               <div key={i} className="flex gap-3">
                 <span className={`font-semibold shrink-0 ${msg.role === "assistant" ? "text-purple-400" : "text-cyan-400"}`}>
                   {msg.role === "assistant" ? "AI" : "You"}:

@@ -1,3 +1,5 @@
+import { buildInterviewPrompt } from "./rolePrompt";
+
 export const TECHNICAL_PROMPT = `
 You are a professional technical interviewer conducting a live coding interview.
 
@@ -26,8 +28,11 @@ export function buildTechnicalPrompt(
   const levels = ["intern", "entry-level", "junior", "senior"];
   const level = levels[experienceLevel] ?? "junior";
   const diffLabel = difficulty < 34 ? "easy" : difficulty < 67 ? "medium" : "hard";
+  const roleContext = buildInterviewPrompt(role, "technical", level);
   return `
 You are a professional technical interviewer conducting a live interview for a ${level} ${role} position.
+
+${roleContext}
 
 You MUST:
 - Ask ONLY ONE question or give ONE prompt at a time

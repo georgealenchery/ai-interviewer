@@ -1,52 +1,52 @@
-import fs from "fs";
-import path from "path";
-import crypto from "crypto";
+import { pool } from "../db";
 import type { SavedInterview, VapiInterviewConfig, VapiAnalysisResult } from "../types/interview";
 
-const DATA_FILE = path.join(__dirname, "../../data/interviews.json");
-
-function readAll(): SavedInterview[] {
-  try {
-    const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(raw) as SavedInterview[];
-  } catch {
-    return [];
-  }
+interface InterviewRow {
+  id: string;
+  date: Date;
+  role: string;
+  question_type: string;
+  config: VapiInterviewConfig;
+  result: VapiAnalysisResult;
 }
 
-function writeAll(data: SavedInterview[]): void {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
+function rowToInterview(row: InterviewRow): SavedInterview {
+  return {
+    id: row.id,
+    date: row.date.toISOString ? row.date.toISOString() : String(row.date),
+    role: row.role,
+    questionType: row.question_type,
+    config: row.config,
+    result: row.result,
+  };
 }
 
-export function saveInterview(
+export async function saveInterview(
+  userId: string,
   config: VapiInterviewConfig,
   result: VapiAnalysisResult,
-): SavedInterview {
-  const interviews = readAll();
-  const entry: SavedInterview = {
-    id: crypto.randomUUID(),
-    date: new Date().toISOString(),
-    role: config.role,
-    questionType: config.questionType,
-    config,
-    result,
-  };
-  interviews.unshift(entry);
-  writeAll(interviews);
-  return entry;
-}
-
-export function getInterviews(): SavedInterview[] {
-  return readAll().sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+): Promise<SavedInterview> {
+  const res = await pool.query(
+    `INSERT INTO interviews (user_id, role, question_type, config, result)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, date, role, question_type, config, result`,
+    [userId, config.role, config.questionType, JSON.stringify(config), JSON.stringify(result)]
   );
+  return rowToInterview(res.rows[0]);
 }
 
-export function getLatestInterview(): SavedInterview | null {
-  const interviews = getInterviews();
-  return interviews[0] ?? null;
+export async function getInterviews(userId: string): Promise<SavedInterview[]> {
+  const res = await pool.query(
+    "SELECT id, date, role, question_type, config, result FROM interviews WHERE user_id = $1 ORDER BY date DESC",
+    [userId]
+  );
+  return res.rows.map(rowToInterview);
+}
+
+export async function getLatestInterview(userId: string): Promise<SavedInterview | null> {
+  const res = await pool.query(
+    "SELECT id, date, role, question_type, config, result FROM interviews WHERE user_id = $1 ORDER BY date DESC LIMIT 1",
+    [userId]
+  );
+  return res.rows.length > 0 ? rowToInterview(res.rows[0]) : null;
 }

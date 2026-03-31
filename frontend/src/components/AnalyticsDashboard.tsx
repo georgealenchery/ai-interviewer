@@ -18,6 +18,7 @@ export function AnalyticsDashboard() {
   const [history, setHistory] = useState<SavedInterview[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     getInterviewHistory()
@@ -37,24 +38,46 @@ export function AnalyticsDashboard() {
   // Chart data from history (oldest first)
   const chartData = [...history]
     .reverse()
-    .map((entry) => ({
-      date: new Date(entry.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      score: entry.result.score,
-    }));
+    .map((entry, idx) => {
+      const d = new Date(entry.date);
+      return {
+        idx,
+        label: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) +
+          " " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+        score: entry.result.score,
+      };
+    });
 
   // If we have a fresh result not yet in history, append it
   if (state?.result && (history.length === 0 || history[0]!.result.score !== state.result.score)) {
-    chartData.push({ date: "Now", score: state.result.score });
+    chartData.push({ idx: chartData.length, label: "Now", score: state.result.score });
   }
 
-  // Past interviews list (most recent first, skip the current one if from state)
-  const pastInterviews = history.map((entry) => ({
-    id: entry.id,
-    date: new Date(entry.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    role: entry.role.charAt(0).toUpperCase() + entry.role.slice(1),
-    score: entry.result.score,
-    type: entry.questionType.charAt(0).toUpperCase() + entry.questionType.slice(1),
-  }));
+  // Group past interviews by time period
+  const groupedHistory = (() => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(startOfToday);
+    startOfWeek.setDate(startOfToday.getDate() - startOfToday.getDay());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const groups: { label: string; entries: SavedInterview[] }[] = [
+      { label: "Today", entries: [] },
+      { label: "This Week", entries: [] },
+      { label: "This Month", entries: [] },
+      { label: "Older", entries: [] },
+    ];
+
+    for (const entry of history) {
+      const d = new Date(entry.date);
+      if (d >= startOfToday) groups[0]!.entries.push(entry);
+      else if (d >= startOfWeek) groups[1]!.entries.push(entry);
+      else if (d >= startOfMonth) groups[2]!.entries.push(entry);
+      else groups[3]!.entries.push(entry);
+    }
+
+    return groups.filter((g) => g.entries.length > 0);
+  })();
 
   if (loading) {
     return (
@@ -213,24 +236,31 @@ export function AnalyticsDashboard() {
           <h3 className="font-semibold text-gray-900 mb-6">Improvement Over Time</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
+              <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="date" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" domain={[0, 100]} />
+                <XAxis
+                  dataKey="idx"
+                  stroke="#6b7280"
+                  tickFormatter={(idx: number) => `#${idx + 1}`}
+                  fontSize={11}
+                />
+                <YAxis stroke="#6b7280" domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "rgba(255, 255, 255, 0.9)",
                     border: "1px solid #e5e7eb",
                     borderRadius: "8px",
                   }}
+                  labelFormatter={(idx: number) => chartData[idx]?.label ?? ""}
+                  formatter={(value: number) => [`${value}%`, "Score"]}
                 />
                 <Line
-                  type="monotone"
+                  type="linear"
                   dataKey="score"
                   stroke="url(#colorGradient)"
-                  strokeWidth={3}
-                  dot={{ fill: "#3b82f6", r: 4 }}
-                  activeDot={{ r: 6 }}
+                  strokeWidth={2}
+                  dot={{ fill: "#3b82f6", r: 3 }}
+                  activeDot={{ r: 5, fill: "#a855f7" }}
                 />
                 <defs>
                   <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
@@ -255,115 +285,155 @@ export function AnalyticsDashboard() {
             className="backdrop-blur-lg bg-white/40 rounded-2xl p-8 border border-white/50 shadow-xl"
           >
             <h3 className="font-semibold text-gray-900 mb-6">Past Interviews</h3>
-            <div className="space-y-3">
+            <div className="space-y-5 max-h-[600px] overflow-y-auto pr-1">
               {history.length === 0 ? (
                 <p className="text-gray-500">No past interviews yet.</p>
               ) : (
-                history.map((entry) => {
-                  const isExpanded = expandedId === entry.id;
-                  const r = entry.result;
+                groupedHistory.map((group) => {
+                  const isCollapsed = collapsedGroups.has(group.label);
                   return (
-                    <div key={entry.id} className="rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                        className="w-full flex items-center justify-between p-4 bg-white/50 hover:bg-white/70 transition-colors rounded-xl"
-                      >
-                        <div className="text-left">
-                          <p className="font-medium text-gray-900">
-                            {entry.role.charAt(0).toUpperCase() + entry.role.slice(1)}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(entry.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} &bull; {entry.questionType.charAt(0).toUpperCase() + entry.questionType.slice(1)}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl font-bold text-blue-600">{r.score}%</span>
-                          {isExpanded ? (
-                            <ChevronUp className="w-4 h-4 text-gray-400" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4 text-gray-400" />
-                          )}
-                        </div>
-                      </button>
-
-                      <AnimatePresence>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="px-4 pb-4 pt-2 space-y-4">
-                              {/* Metric bars */}
-                              <div className="grid grid-cols-3 gap-3">
-                                <div>
-                                  <p className="text-xs text-gray-500 mb-1">Communication</p>
-                                  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${r.communication}%` }} />
-                                  </div>
-                                  <p className="text-xs font-semibold text-gray-700 mt-0.5">{r.communication}%</p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-500 mb-1">Technical</p>
-                                  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div className="h-full bg-purple-500 rounded-full" style={{ width: `${r.technicalAccuracy}%` }} />
-                                  </div>
-                                  <p className="text-xs font-semibold text-gray-700 mt-0.5">{r.technicalAccuracy}%</p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-500 mb-1">Problem Solving</p>
-                                  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                    <div className="h-full bg-pink-500 rounded-full" style={{ width: `${r.problemSolving}%` }} />
-                                  </div>
-                                  <p className="text-xs font-semibold text-gray-700 mt-0.5">{r.problemSolving}%</p>
-                                </div>
+                  <div key={group.label}>
+                    <button
+                      onClick={() => setCollapsedGroups((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(group.label)) next.delete(group.label);
+                        else next.add(group.label);
+                        return next;
+                      })}
+                      className="flex items-center gap-2 mb-2 group w-full"
+                    >
+                      {isCollapsed ? (
+                        <ChevronDown className="w-3 h-3 text-gray-400 group-hover:text-gray-600" />
+                      ) : (
+                        <ChevronUp className="w-3 h-3 text-gray-400 group-hover:text-gray-600" />
+                      )}
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors">
+                        {group.label}
+                      </span>
+                      <span className="text-xs text-gray-400">({group.entries.length})</span>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {!isCollapsed && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                    <div className="space-y-3">
+                      {group.entries.map((entry) => {
+                        const isExpanded = expandedId === entry.id;
+                        const r = entry.result;
+                        return (
+                          <div key={entry.id} className="rounded-xl overflow-hidden">
+                            <button
+                              onClick={() => setExpandedId(isExpanded ? null : entry.id)}
+                              className="w-full flex items-center justify-between p-4 bg-white/50 hover:bg-white/70 transition-colors rounded-xl"
+                            >
+                              <div className="text-left">
+                                <p className="font-medium text-gray-900">
+                                  {entry.role.charAt(0).toUpperCase() + entry.role.slice(1)}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  {new Date(entry.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} &bull; {entry.questionType.charAt(0).toUpperCase() + entry.questionType.slice(1)}
+                                </p>
                               </div>
+                              <div className="flex items-center gap-3">
+                                <span className="text-2xl font-bold text-blue-600">{r.score}%</span>
+                                {isExpanded ? (
+                                  <ChevronUp className="w-4 h-4 text-gray-400" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                                )}
+                              </div>
+                            </button>
 
-                              {/* Strengths */}
-                              {r.strengths.length > 0 && (
-                                <div>
-                                  <h4 className="text-xs font-semibold text-green-700 mb-1">Strengths</h4>
-                                  <ul className="space-y-0.5 text-xs text-gray-600 ml-3">
-                                    {r.strengths.map((s, i) => <li key={i}>&bull; {s}</li>)}
-                                  </ul>
-                                </div>
-                              )}
-
-                              {/* Improvements */}
-                              {r.improvements.length > 0 && (
-                                <div>
-                                  <h4 className="text-xs font-semibold text-orange-700 mb-1">Areas to Improve</h4>
-                                  <ul className="space-y-0.5 text-xs text-gray-600 ml-3">
-                                    {r.improvements.map((s, i) => <li key={i}>&bull; {s}</li>)}
-                                  </ul>
-                                </div>
-                              )}
-
-                              {/* Question Breakdown */}
-                              {r.questionBreakdown.length > 0 && (
-                                <div>
-                                  <h4 className="text-xs font-semibold text-gray-700 mb-2">Question Breakdown</h4>
-                                  <div className="space-y-2">
-                                    {r.questionBreakdown.map((q, i) => (
-                                      <div key={i} className="bg-white/60 rounded-lg p-3">
-                                        <div className="flex items-start justify-between gap-2 mb-1">
-                                          <p className="text-xs font-medium text-gray-800">{q.question}</p>
-                                          <span className="text-xs font-bold text-blue-600 shrink-0">{q.score}%</span>
+                            <AnimatePresence>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="px-4 pb-4 pt-2 space-y-4">
+                                    {/* Metric bars */}
+                                    <div className="grid grid-cols-3 gap-3">
+                                      <div>
+                                        <p className="text-xs text-gray-500 mb-1">Communication</p>
+                                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                          <div className="h-full bg-blue-500 rounded-full" style={{ width: `${r.communication}%` }} />
                                         </div>
-                                        <p className="text-xs text-gray-500 mb-1">{q.candidateAnswer}</p>
-                                        <p className="text-xs text-gray-600 italic">{q.feedback}</p>
+                                        <p className="text-xs font-semibold text-gray-700 mt-0.5">{r.communication}%</p>
                                       </div>
-                                    ))}
+                                      <div>
+                                        <p className="text-xs text-gray-500 mb-1">Technical</p>
+                                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                          <div className="h-full bg-purple-500 rounded-full" style={{ width: `${r.technicalAccuracy}%` }} />
+                                        </div>
+                                        <p className="text-xs font-semibold text-gray-700 mt-0.5">{r.technicalAccuracy}%</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-gray-500 mb-1">Problem Solving</p>
+                                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                          <div className="h-full bg-pink-500 rounded-full" style={{ width: `${r.problemSolving}%` }} />
+                                        </div>
+                                        <p className="text-xs font-semibold text-gray-700 mt-0.5">{r.problemSolving}%</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Strengths */}
+                                    {r.strengths.length > 0 && (
+                                      <div>
+                                        <h4 className="text-xs font-semibold text-green-700 mb-1">Strengths</h4>
+                                        <ul className="space-y-0.5 text-xs text-gray-600 ml-3">
+                                          {r.strengths.map((s, i) => <li key={i}>&bull; {s}</li>)}
+                                        </ul>
+                                      </div>
+                                    )}
+
+                                    {/* Improvements */}
+                                    {r.improvements.length > 0 && (
+                                      <div>
+                                        <h4 className="text-xs font-semibold text-orange-700 mb-1">Areas to Improve</h4>
+                                        <ul className="space-y-0.5 text-xs text-gray-600 ml-3">
+                                          {r.improvements.map((s, i) => <li key={i}>&bull; {s}</li>)}
+                                        </ul>
+                                      </div>
+                                    )}
+
+                                    {/* Question Breakdown */}
+                                    {r.questionBreakdown.length > 0 && (
+                                      <div>
+                                        <h4 className="text-xs font-semibold text-gray-700 mb-2">Question Breakdown</h4>
+                                        <div className="space-y-2">
+                                          {r.questionBreakdown.map((q, i) => (
+                                            <div key={i} className="bg-white/60 rounded-lg p-3">
+                                              <div className="flex items-start justify-between gap-2 mb-1">
+                                                <p className="text-xs font-medium text-gray-800">{q.question}</p>
+                                                <span className="text-xs font-bold text-blue-600 shrink-0">{q.score}%</span>
+                                              </div>
+                                              <p className="text-xs text-gray-500 mb-1">{q.candidateAnswer}</p>
+                                              <p className="text-xs text-gray-600 italic">{q.feedback}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
-                                </div>
+                                </motion.div>
                               )}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
                     </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                   );
                 })
               )}

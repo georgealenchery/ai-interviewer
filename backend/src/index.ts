@@ -6,6 +6,10 @@ import cors from "cors";
 import interviewRoutes from "./routes/interview";
 import vapiRoutes from "./routes/vapi";
 import analysisRoutes from "./routes/analysis";
+import authRoutes from "./routes/auth";
+import { authMiddleware } from "./middleware/auth";
+import { validateEnv } from "./config";
+import { initDb } from "./db";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -17,10 +21,25 @@ app.get("/", (_req, res) => {
     res.send("Hello, AI Interviewer!");
 });
 
-app.use("/api", interviewRoutes);
+// Public routes
+app.use("/api/auth", authRoutes);
 app.use("/api/vapi", vapiRoutes);
-app.use("/api/analysis", analysisRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Protected routes
+app.use("/api/analysis", authMiddleware, analysisRoutes);
+app.use("/api", authMiddleware, interviewRoutes);
+
+async function start() {
+  try {
+    validateEnv();
+    await initDb();
+    app.listen(PORT, () => {
+      console.log(`[Server] Running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("[Server] Startup failed:", err);
+    process.exit(1);
+  }
+}
+
+start();

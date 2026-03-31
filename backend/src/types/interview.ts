@@ -47,6 +47,19 @@ export type ApiErrorResponse = {
   details?: string;
 };
 
+export type TestCase = {
+  input: unknown[];
+  expectedOutput: unknown;
+  description?: string;
+};
+
+export type CodingProblem = {
+  prompt: string;
+  functionName: string;
+  functionSignature: string;
+  testCases: TestCase[];
+};
+
 export type VapiTranscriptEntry = {
   role: "assistant" | "user";
   text: string;

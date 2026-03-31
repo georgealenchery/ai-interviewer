@@ -8,13 +8,51 @@ import { TechnicalChatPanel } from "./TechnicalChatPanel";
 import { TechnicalCodeEditor } from "./TechnicalCodeEditor";
 import { useVapiTechnicalInterview } from "../../hooks/useVapiTechnicalInterview";
 import type { VapiTechnicalConfig } from "../../hooks/useVapiTechnicalInterview";
-import { getRandomProblem } from "../../data/technicalProblems";
-import type { TechnicalProblem } from "../../data/technicalProblems";
+import { generateInterviewQuestions } from "../../services/api";
+import type { CodingProblem } from "../../services/api";
+
+const FALLBACK_PROBLEMS: CodingProblem[] = [
+  {
+    prompt: "Write a function that takes an array of numbers and returns the two numbers that add up to the given target. Return them as an array in the order they appear.",
+    functionName: "twoSum",
+    functionSignature: "function twoSum(nums, target) {\n  // Your implementation here\n}",
+    testCases: [
+      { input: [[2, 7, 11, 15], 9], expectedOutput: [2, 7] },
+      { input: [[3, 2, 4], 6], expectedOutput: [2, 4] },
+      { input: [[1, 5, 3, 7], 8], expectedOutput: [1, 7] },
+    ],
+  },
+  {
+    prompt: "Write a function that takes a string and returns true if it is a valid palindrome (ignoring non-alphanumeric characters and case), false otherwise.",
+    functionName: "isPalindrome",
+    functionSignature: "function isPalindrome(s) {\n  // Your implementation here\n}",
+    testCases: [
+      { input: ["A man, a plan, a canal: Panama"], expectedOutput: true },
+      { input: ["race a car"], expectedOutput: false },
+      { input: ["Was it a car or a cat I saw?"], expectedOutput: true },
+    ],
+  },
+  {
+    prompt: "Write a function that takes an array of integers and returns the maximum sum of any contiguous subarray.",
+    functionName: "maxSubarraySum",
+    functionSignature: "function maxSubarraySum(nums) {\n  // Your implementation here\n}",
+    testCases: [
+      { input: [[-2, 1, -3, 4, -1, 2, 1, -5, 4]], expectedOutput: 6 },
+      { input: [[1]], expectedOutput: 1 },
+      { input: [[5, 4, -1, 7, 8]], expectedOutput: 23 },
+    ],
+  },
+];
 
 export function TechnicalInterviewLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [time, setTime] = useState(0);
+  const [problems, setProblems] = useState<CodingProblem[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
+  // Track which problems have all tests passing
+  const [passed, setPassed] = useState<boolean[]>([false, false, false]);
 
   const {
     status,
@@ -38,23 +76,39 @@ export function TechnicalInterviewLayout() {
   } | null;
 
   const role = state?.role ?? "frontend";
-  const mode = "technical" as const;
   const difficultyValue = state?.difficulty ?? 50;
-  const difficultyLabel = difficultyValue <= 30 ? "Easy" : difficultyValue <= 60 ? "Medium" : "Hard";
+  const experienceLevelValue = state?.experienceLevel ?? 50;
 
-  const [problem] = useState<TechnicalProblem>(() => getRandomProblem(difficultyValue));
+  const difficultyLabel = difficultyValue <= 30 ? "easy" : difficultyValue <= 60 ? "medium" : "hard";
+  const difficultyDisplay = difficultyLabel.charAt(0).toUpperCase() + difficultyLabel.slice(1);
+  const level = experienceLevelValue <= 30 ? "junior" : experienceLevelValue <= 60 ? "mid" : "senior";
+
+  // Fetch AI-generated coding problems once on mount — do NOT regenerate mid-session
+  useEffect(() => {
+    setQuestionsLoading(true);
+    generateInterviewQuestions(role, difficultyLabel, level)
+      .then((ps) => {
+        console.log("Generated coding problems:", ps);
+        setProblems(ps);
+      })
+      .catch(() => {
+        console.warn("Failed to generate problems, using fallback");
+        setProblems(FALLBACK_PROBLEMS);
+      })
+      .finally(() => setQuestionsLoading(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const interviewConfig: VapiTechnicalConfig = {
     role,
     difficulty: difficultyValue,
-    experienceLevel: state?.experienceLevel ?? 50,
+    experienceLevel: experienceLevelValue,
     strictness: state?.strictness ?? 50,
     questionType: (state?.questionType ?? "technical") as VapiTechnicalConfig["questionType"],
-    problemTitle: problem.title,
-    problemDescription: problem.description,
+    // Pass problem prompts as the voice questions so the interviewer reads them aloud
+    questions: problems.map((p) => p.prompt),
+    level,
   };
 
-  // Start Vapi from a user click (required for browser audio/mic permissions)
   const handleStart = () => {
     start(interviewConfig);
   };
@@ -87,6 +141,24 @@ export function TechnicalInterviewLayout() {
     }
   }, [callEndedNaturally]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleTestResults = (allPassed: boolean) => {
+    setPassed((prev) => {
+      const updated = [...prev];
+      updated[currentQuestion] = allPassed;
+      return updated;
+    });
+  };
+
+  const handleNext = () => {
+    if (passed[currentQuestion]) {
+      setCurrentQuestion((q) => Math.min(problems.length - 1, q + 1));
+    }
+  };
+
+  const handlePrev = () => {
+    setCurrentQuestion((q) => Math.max(0, q - 1));
+  };
+
   // Analyzing overlay
   if (isAnalyzing) {
     return (
@@ -104,19 +176,25 @@ export function TechnicalInterviewLayout() {
       <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col items-center justify-center">
         <div className="text-center max-w-md">
           <h1 className="text-2xl font-bold mb-2">Technical Interview</h1>
-          <p className="text-gray-400 mb-2">{problem.title} — {problem.difficulty}</p>
+          <p className="text-gray-400 mb-2 capitalize">{role} · {difficultyDisplay} · {level}</p>
           <p className="text-sm text-gray-500 mb-8">
-            Your AI interviewer will guide you through the problem using voice. Make sure your microphone is ready.
+            {questionsLoading
+              ? "Preparing your coding problems..."
+              : "You'll solve 3 coding problems. Write your solutions in the editor and pass all tests to advance. Your AI interviewer will guide you through each one."}
           </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleStart}
-            className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
-          >
-            <Mic className="w-5 h-5" />
-            <span>Start Interview</span>
-          </motion.button>
+          {questionsLoading ? (
+            <div className="w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto" />
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStart}
+              className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
+            >
+              <Mic className="w-5 h-5" />
+              <span>Start Interview</span>
+            </motion.button>
+          )}
         </div>
       </div>
     );
@@ -132,27 +210,34 @@ export function TechnicalInterviewLayout() {
     );
   }
 
+  const currentProblem = problems[currentQuestion] ?? null;
+  const nextLocked = !passed[currentQuestion];
+
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col p-4 overflow-hidden">
       {/* Toolbar */}
       <TechnicalToolbar
         role={role}
-        difficulty={difficultyLabel}
-        questionNumber={1}
-        totalQuestions={1}
+        difficulty={difficultyDisplay}
+        level={level}
+        questionNumber={currentQuestion + 1}
+        totalQuestions={problems.length || 3}
         time={time}
-        mode="technical"
         onEnd={handleEnd}
       />
 
       {/* Split Layout */}
       <div className="flex-1 grid lg:grid-cols-[2fr_3fr] gap-4 min-h-0">
-        {/* Left Panel — Prompt + Chat */}
+        {/* Left Panel — Problem Prompt + Chat */}
         <div className="flex flex-col gap-4 min-h-0">
           <TechnicalPromptCard
-            prompt={problem}
-            questionNumber={1}
-            totalQuestions={1}
+            problem={currentProblem}
+            questionNumber={currentQuestion + 1}
+            totalQuestions={problems.length || 3}
+            passed={passed[currentQuestion]}
+            onPrev={handlePrev}
+            onNext={handleNext}
+            nextLocked={nextLocked}
           />
           <div className="flex-1 min-h-0">
             <TechnicalChatPanel
@@ -166,7 +251,11 @@ export function TechnicalInterviewLayout() {
 
         {/* Right Panel — Code Editor */}
         <div className="backdrop-blur-lg bg-gray-900/80 rounded-2xl border border-white/10 shadow-xl overflow-hidden flex flex-col min-h-0">
-          <TechnicalCodeEditor problem={problem} onAllTestsPass={handleEnd} />
+          <TechnicalCodeEditor
+            problem={currentProblem}
+            questionIndex={currentQuestion}
+            onAllTestsPassed={handleTestResults}
+          />
         </div>
       </div>
     </div>

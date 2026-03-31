@@ -2,7 +2,43 @@ import { useEffect, useRef, useState } from "react";
 import { vapi } from "../lib/vapi";
 import { evaluateVapiInterview } from "../services/api";
 import type { VapiAnalysisResult } from "../services/api";
-import type { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
+import type { CreateAssistantDTO, ElevenLabsVoice, VapiVoice } from "@vapi-ai/web/dist/api";
+
+// Discriminated union using the SDK's exact voiceId constraints
+type ElevenLabsVoiceConfig = { provider: "11labs"; voiceId: string };
+type VapiVoiceConfig = { provider: "vapi"; voiceId: VapiVoice["voiceId"] };
+type VoiceConfig = ElevenLabsVoiceConfig | VapiVoiceConfig;
+
+function resolveVoice(voice: VoiceConfig): ElevenLabsVoice | VapiVoice {
+  if (voice.provider === "11labs") {
+    return { provider: "11labs", voiceId: voice.voiceId };
+  }
+  return { provider: "vapi", voiceId: voice.voiceId };
+}
+
+interface InterviewerConfig {
+  name: string;
+  voice: VoiceConfig;
+  personality: string;
+}
+
+export const INTERVIEWERS: Record<string, InterviewerConfig> = {
+  cassidy: {
+    name: "Cassidy",
+    voice: { provider: "11labs", voiceId: "21m00Tcm4TlvDq8ikWAM" },
+    personality: `Your name is Cassidy. You are warm and encouraging, but sharp — you do not let weak or vague answers slide. You build rapport quickly and make candidates feel comfortable, then challenge them to go deeper once they are at ease. Your tone is conversational and supportive, but your follow-up questions are pointed.`,
+  },
+  alex: {
+    name: "Alex",
+    voice: { provider: "vapi", voiceId: "Rohan" },
+    personality: `Your name is Alex. You are direct, precise, and highly technical. You value structured thinking and concise answers. You have no patience for hand-waving. If an answer is incomplete, you say so plainly and ask again. Your tone is professional and neutral — not cold, but strictly focused.`,
+  },
+  jordan: {
+    name: "Jordan",
+    voice: { provider: "11labs", voiceId: "EXAVITQu4vr4xnSDxMaL" },
+    personality: `Your name is Jordan. You are calm, methodical, and curious. You probe the candidate's reasoning rather than testing memorized facts. You ask things like "walk me through how you got there" and "what would you change if the requirements shifted?" You care about thought process above all.`,
+  },
+};
 
 interface VapiTranscriptMessage {
   type: string;
@@ -30,6 +66,7 @@ export interface VapiInterviewConfig {
   experienceLevel: number;
   strictness: number;
   questionType: "behavioral" | "technical";
+  interviewer?: string;
 }
 
 const ROLE_TOPICS: Record<string, string> = {
@@ -65,7 +102,7 @@ function getStrictnessLabel(s: number): string {
   return "Strict";
 }
 
-function buildSystemPrompt(config: VapiInterviewConfig): string {
+function buildSystemPrompt(config: VapiInterviewConfig, interviewerPersonality: string): string {
   const topics = ROLE_TOPICS[config.role] ?? "general software engineering, algorithms, system design, and coding best practices";
   const roleLabel = config.role.charAt(0).toUpperCase() + config.role.slice(1);
 
@@ -118,7 +155,9 @@ Every question must tie back to technical work. Don't ask generic behavioral que
 Ask coding concepts, system design, debugging scenarios, and architecture questions. No behavioral questions at all. Dive straight into technical topics.`;
   }
 
-  return `You're a senior ${roleLabel} engineering interviewer. Your name is the interviewer name the candidate sees on screen.
+  return `${interviewerPersonality}
+
+You're a senior ${roleLabel} engineering interviewer.
 
 You only ask questions about software engineering, computer science, and technology. Your focus area is ${topics}.
 If the candidate tries to go off-topic or ask you questions, redirect them. Say something like "That's an interesting thought, but let's stay focused on the interview." Then ask your next question.
@@ -167,11 +206,11 @@ const FIRST_MESSAGE_TOPICS: Record<string, string> = {
   data: "some data engineering and SQL topics",
 };
 
-function buildFirstMessage(config: VapiInterviewConfig): string {
+function buildFirstMessage(config: VapiInterviewConfig, interviewerName: string): string {
   const roleLabel = config.role.charAt(0).toUpperCase() + config.role.slice(1);
   const topicPreview = FIRST_MESSAGE_TOPICS[config.role] ?? "some software engineering topics";
 
-  return `Hi, thanks for joining today. I'll be running your ${roleLabel} engineering interview. We'll go over ${topicPreview}. Ready to dive in?`;
+  return `Hi, thanks for joining today. I'm ${interviewerName}. I'll be running your ${roleLabel} engineering interview. We'll go over ${topicPreview}. Ready to dive in?`;
 }
 
 export { getDifficultyLabel, getExperienceLabel, getStrictnessLabel };
@@ -281,8 +320,14 @@ export function useVapiInterview() {
       await audioContext.resume();
       console.log("AudioContext state:", audioContext.state);
 
-      const systemPrompt = buildSystemPrompt(config);
-      const firstMessage = buildFirstMessage(config);
+      const interviewerKey = (config.interviewer ?? "cassidy").toLowerCase();
+      const interviewer = INTERVIEWERS[interviewerKey] ?? INTERVIEWERS["cassidy"]!;
+      const resolvedVoice = resolveVoice(interviewer.voice);
+      console.log("Selected interviewer:", interviewerKey);
+      console.log("Resolved voice:", resolvedVoice);
+
+      const systemPrompt = buildSystemPrompt(config, interviewer.personality);
+      const firstMessage = buildFirstMessage(config, interviewer.name);
       console.log("System prompt length:", systemPrompt.length);
       console.log("First message:", firstMessage);
 
@@ -292,7 +337,7 @@ export function useVapiInterview() {
           model: "gpt-4.1",
           messages: [{ role: "system", content: systemPrompt }],
         },
-        voice: { provider: "vapi", voiceId: "Cole", speed: 0.9 },
+        voice: resolvedVoice,
         transcriber: { provider: "deepgram", model: "nova-3", language: "en" },
         firstMessage,
         backgroundSpeechDenoisingPlan: {

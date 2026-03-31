@@ -1,10 +1,31 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { analyzeVapiTranscript } from "../services/aiService";
+import { analyzeVapiTranscript, generateInterviewQuestions } from "../services/aiService";
 import { saveInterview, getInterviews } from "../services/storageService";
 import type { VapiTranscriptEntry, VapiInterviewConfig } from "../types/interview";
 
 const router = Router();
+
+// POST /api/analysis/questions — generate 3 role-aware technical questions
+router.post("/questions", async (req: Request, res: Response) => {
+  try {
+    const { role, difficulty, level } = req.body as {
+      role: string;
+      difficulty: string;
+      level: string;
+    };
+
+    if (!role || !difficulty || !level) {
+      return res.status(400).json({ error: "Missing required fields: role, difficulty, level" });
+    }
+
+    const problems = await generateInterviewQuestions(role, difficulty, level);
+    res.json({ problems });
+  } catch (err) {
+    console.error("Error generating questions:", err);
+    res.status(500).json({ error: "Failed to generate questions" });
+  }
+});
 
 // POST /api/analysis/evaluate — analyze a completed voice interview
 router.post("/evaluate", async (req: Request, res: Response) => {
@@ -23,7 +44,7 @@ router.post("/evaluate", async (req: Request, res: Response) => {
     }
 
     const result = await analyzeVapiTranscript(transcript, config);
-    const saved = saveInterview(config, result);
+    const saved = await saveInterview(req.user!.id, config, result);
 
     res.json({ id: saved.id, result });
   } catch (err) {
@@ -33,9 +54,9 @@ router.post("/evaluate", async (req: Request, res: Response) => {
 });
 
 // GET /api/analysis/history — return all past interview results
-router.get("/history", (_req: Request, res: Response) => {
+router.get("/history", async (req: Request, res: Response) => {
   try {
-    const interviews = getInterviews();
+    const interviews = await getInterviews(req.user!.id);
     res.json({ interviews });
   } catch (err) {
     console.error("Error fetching interview history:", err);

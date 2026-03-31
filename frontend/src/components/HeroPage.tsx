@@ -52,8 +52,6 @@ export function HeroPage() {
 
       {/* Navbar */}
       <DashboardNavbar
-        userName="Lorenna"
-        userInitials="LK"
         activeTab="Dashboard"
       />
 

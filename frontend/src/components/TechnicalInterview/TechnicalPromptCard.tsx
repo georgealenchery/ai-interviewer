@@ -1,89 +1,111 @@
 import { motion } from "motion/react";
-
-type Difficulty = "Easy" | "Medium" | "Hard";
-
-type Example = {
-  input: string;
-  output: string;
-  explanation?: string;
-};
-
-type Prompt = {
-  title: string;
-  difficulty: Difficulty;
-  description: string;
-  constraints: string[];
-  examples: Example[];
-};
+import { ChevronLeft, ChevronRight, Code2, Lock, CheckCircle2 } from "lucide-react";
+import type { CodingProblem } from "../../services/api";
 
 type TechnicalPromptCardProps = {
-  prompt: Prompt;
+  problem: CodingProblem | null;
   questionNumber: number;
   totalQuestions: number;
+  passed: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+  nextLocked: boolean;
 };
 
-const DIFFICULTY_STYLES: Record<Difficulty, string> = {
-  Easy: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
-  Medium: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
-  Hard: "text-red-400 bg-red-500/10 border-red-500/30",
-};
-
-export function TechnicalPromptCard({ prompt, questionNumber, totalQuestions }: TechnicalPromptCardProps) {
+export function TechnicalPromptCard({
+  problem,
+  questionNumber,
+  totalQuestions,
+  passed,
+  onPrev,
+  onNext,
+  nextLocked,
+}: TechnicalPromptCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="backdrop-blur-lg bg-white/5 rounded-2xl border border-white/10 shadow-xl overflow-hidden"
     >
-      {/* Prompt Header */}
-      <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-medium text-gray-400">
-            Question {questionNumber}/{totalQuestions}
+      {/* Header */}
+      <div className="px-5 py-3 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Code2 className="w-4 h-4 text-blue-400" />
+          <span className="text-xs font-semibold text-blue-400 uppercase tracking-wide">
+            Problem {questionNumber} of {totalQuestions}
           </span>
-          <span className="text-white font-semibold">{prompt.title}</span>
+          {passed && (
+            <span className="flex items-center gap-1 text-xs text-green-400 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Solved
+            </span>
+          )}
         </div>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${DIFFICULTY_STYLES[prompt.difficulty]}`}>
-          {prompt.difficulty}
-        </span>
-      </div>
 
-      {/* Prompt Body */}
-      <div className="px-5 py-4 space-y-4 max-h-64 overflow-y-auto">
-        {/* Description */}
-        <p className="text-sm text-gray-300 leading-relaxed">{prompt.description}</p>
-
-        {/* Examples */}
-        {prompt.examples.map((ex, i) => (
-          <div key={i} className="bg-gray-800/60 rounded-xl p-3 space-y-1.5 border border-white/5">
-            <p className="text-xs font-semibold text-gray-400">Example {i + 1}</p>
-            <p className="text-xs font-mono text-gray-300">
-              <span className="text-gray-500">Input: </span>{ex.input}
-            </p>
-            <p className="text-xs font-mono text-gray-300">
-              <span className="text-gray-500">Output: </span>{ex.output}
-            </p>
-            {ex.explanation && (
-              <p className="text-xs text-gray-400">
-                <span className="text-gray-500">Explanation: </span>{ex.explanation}
-              </p>
-            )}
-          </div>
-        ))}
-
-        {/* Constraints */}
-        <div>
-          <p className="text-xs font-semibold text-gray-400 mb-2">Constraints</p>
-          <ul className="space-y-1">
-            {prompt.constraints.map((c, i) => (
-              <li key={i} className="text-xs font-mono text-gray-400 flex items-start gap-2">
-                <span className="text-gray-600 mt-0.5">•</span>
-                {c}
-              </li>
+        {/* Navigation */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onPrev}
+            disabled={questionNumber <= 1}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            title="Previous problem"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div className="flex gap-1 px-1">
+            {Array.from({ length: totalQuestions }, (_, i) => (
+              <div
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  i + 1 === questionNumber ? "bg-blue-400" : "bg-white/20"
+                }`}
+              />
             ))}
-          </ul>
+          </div>
+          <button
+            onClick={onNext}
+            disabled={questionNumber >= totalQuestions || nextLocked}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            title={nextLocked ? "Pass all tests to unlock next problem" : "Next problem"}
+          >
+            {nextLocked && questionNumber < totalQuestions ? (
+              <Lock className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Problem Body */}
+      <motion.div
+        key={questionNumber}
+        initial={{ opacity: 0, x: 8 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.2 }}
+        className="px-5 py-4"
+      >
+        {problem ? (
+          <div className="space-y-3">
+            <p className="text-sm text-gray-200 leading-relaxed">{problem.prompt}</p>
+            <div className="bg-gray-900/60 rounded-lg border border-white/10 p-3">
+              <p className="text-xs text-gray-500 mb-1.5 font-medium uppercase tracking-wide">Function Signature</p>
+              <pre className="text-xs text-blue-300 font-mono whitespace-pre-wrap break-all leading-relaxed">
+                {problem.functionSignature}
+              </pre>
+            </div>
+            <p className="text-xs text-gray-500">
+              {problem.testCases.length} test case{problem.testCases.length !== 1 ? "s" : ""} · Pass all to continue
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="h-3 bg-white/10 rounded animate-pulse w-full" />
+            <div className="h-3 bg-white/10 rounded animate-pulse w-4/5" />
+            <div className="h-3 bg-white/10 rounded animate-pulse w-3/5" />
+          </div>
+        )}
+      </motion.div>
     </motion.div>
   );
 }

@@ -1,3 +1,5 @@
+import { buildInterviewPrompt } from "./rolePrompt";
+
 export const BEHAVIORAL_PROMPT = `
 You are a professional interviewer conducting a live behavioral interview.
 
@@ -21,8 +23,11 @@ You are having a live conversation. Be warm, professional, and concise.
 export function buildBehavioralPrompt(role: string, experienceLevel: number): string {
   const levels = ["intern", "entry-level", "junior", "senior"];
   const level = levels[experienceLevel] ?? "junior";
+  const roleContext = buildInterviewPrompt(role, "behavioral", level);
   return `
 You are a professional interviewer conducting a live behavioral interview for a ${level} ${role} position.
+
+${roleContext}
 
 You MUST:
 - Ask ONLY ONE question at a time

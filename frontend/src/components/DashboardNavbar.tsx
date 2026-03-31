@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Bell, ChevronDown, FileText, LogOut, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router";
 import logo from "../assets/finallogoace.png";
+import { getUser, logout } from "../services/auth";
 
 interface DashboardNavbarProps {
   userName?: string;
@@ -11,10 +12,18 @@ interface DashboardNavbarProps {
 }
 
 export function DashboardNavbar({
-  userName = "Lorenna",
-  userInitials = "LK",
+  userName,
+  userInitials,
   activeTab = "Dashboard",
 }: DashboardNavbarProps) {
+  const authUser = getUser();
+  const resolvedName = userName ?? authUser?.name ?? authUser?.email?.split("@")[0] ?? "User";
+  const resolvedInitials = userInitials ?? resolvedName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -49,7 +58,7 @@ export function DashboardNavbar({
             src={logo}
             alt="ACE.AI logo"
             className="h-auto w-[80px] object-contain"
-            style={{ transform: "scale(1.8)", transformOrigin: "left center" }}
+            style={{ transform: "scale(1.5)", transformOrigin: "left center" }}
           />
         </div>
 
@@ -107,11 +116,11 @@ export function DashboardNavbar({
               className="flex items-center gap-3 rounded-xl py-2 pl-2 pr-3 transition-all hover:bg-white/50 lg:pr-4"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-purple-500 text-sm font-semibold text-white shadow-sm">
-                {userInitials}
+                {resolvedInitials}
               </div>
 
               <span className="hidden font-medium text-gray-900 sm:block">
-                {userName}
+                {resolvedName}
               </span>
 
               <motion.div
@@ -148,7 +157,7 @@ export function DashboardNavbar({
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        navigate("/");
+                        logout();
                       }}
                       className="flex w-full items-center gap-3 px-4 py-3 text-red-600 transition-all hover:bg-red-50/50"
                     >
