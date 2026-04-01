@@ -153,30 +153,48 @@ const FALLBACK_PROBLEMS: CodingProblem[] = [
   },
 ];
 
+const SIGNATURE_GUIDE: Record<string, string> = {
+  JavaScript: 'function funcName(param1, param2) {\\n  // Your implementation here\\n}',
+  "Node.js":  'function funcName(param1, param2) {\\n  // Your implementation here\\n}',
+  TypeScript: 'function funcName(param1: Type1, param2: Type2): ReturnType {\\n  // Your implementation here\\n}',
+  Python:     'def func_name(param1, param2):\\n    # Your implementation here\\n    pass',
+  Java:       'public static ReturnType funcName(Type1 param1, Type2 param2) {\\n    // Your implementation here\\n}',
+  "C++":      'ReturnType funcName(Type1 param1, Type2 param2) {\\n    // Your implementation here\\n}',
+  Bash:       '#!/bin/bash\\n\\n# Your implementation here',
+};
+
 /**
- * Generate 3 role-aware, difficulty-aware coding interview problems.
+ * Generate 3 role-aware, language-specific coding interview problems.
  */
 export async function generateInterviewQuestions(
   role: string,
   difficulty: string,
   level: string,
+  language = "JavaScript",
 ): Promise<CodingProblem[]> {
   console.log("Role:", role);
+  console.log("Language:", language);
   console.log("Difficulty:", difficulty);
   console.log("Level:", level);
 
   const guidelines = ROLE_GUIDELINES[role] ?? "software engineering fundamentals";
+  const signatureExample = SIGNATURE_GUIDE[language] ?? SIGNATURE_GUIDE["JavaScript"]!;
 
   const prompt = `You are a senior ${role} engineer creating a ${level}-level ${difficulty} technical coding interview.
+
+The candidate must write code in ${language} ONLY. Do not use any other programming language.
 
 Focus on: ${guidelines}
 
 Generate EXACTLY 3 coding problems. Each problem must:
 - Be a realistic, role-relevant coding challenge (not a pure abstract algorithm)
-- Require writing a JavaScript function
+- Require writing a ${language} function/solution
 - Be solvable in 10-20 minutes at the ${difficulty} difficulty
 - Test different concepts
 - Have 3-5 concrete test cases with actual input values and expected outputs
+
+Function signature format for ${language}:
+${signatureExample}
 
 Difficulty guide:
 - easy: straightforward logic, no complex algorithms, clear requirements
@@ -187,8 +205,8 @@ Return ONLY valid JSON in this exact format (no markdown, no extra text):
 [
   {
     "prompt": "Clear problem description with context and requirements...",
-    "functionName": "camelCaseFunctionName",
-    "functionSignature": "function camelCaseFunctionName(param1, param2) {\\n  // Your implementation here\\n}",
+    "functionName": "funcName",
+    "functionSignature": "<valid ${language} function signature with placeholder body>",
     "testCases": [
       { "input": [arg1, arg2], "expectedOutput": result },
       { "input": [arg1, arg2], "expectedOutput": result },

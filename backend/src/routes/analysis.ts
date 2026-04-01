@@ -9,17 +9,18 @@ const router = Router();
 // POST /api/analysis/questions — generate 3 role-aware technical questions
 router.post("/questions", async (req: Request, res: Response) => {
   try {
-    const { role, difficulty, level } = req.body as {
+    const { role, difficulty, level, language } = req.body as {
       role: string;
       difficulty: string;
       level: string;
+      language?: string;
     };
 
     if (!role || !difficulty || !level) {
       return res.status(400).json({ error: "Missing required fields: role, difficulty, level" });
     }
 
-    const problems = await generateInterviewQuestions(role, difficulty, level);
+    const problems = await generateInterviewQuestions(role, difficulty, level, language);
     res.json({ problems });
   } catch (err) {
     console.error("Error generating questions:", err);

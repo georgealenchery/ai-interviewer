@@ -4,6 +4,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import interviewRoutes from "./routes/interview";
+import interviewsRoutes from "./routes/interviews";
 import vapiRoutes from "./routes/vapi";
 import analysisRoutes from "./routes/analysis";
 import authRoutes from "./routes/auth";
@@ -27,6 +28,7 @@ app.use("/api/vapi", vapiRoutes);
 
 // Protected routes
 app.use("/api/analysis", authMiddleware, analysisRoutes);
+app.use("/api/interviews", authMiddleware, interviewsRoutes);
 app.use("/api", authMiddleware, interviewRoutes);
 
 async function start() {
