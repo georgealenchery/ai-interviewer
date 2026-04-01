@@ -1,14 +1,62 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { motion } from "motion/react";
+import { Volume2, Loader2 } from "lucide-react";
 import * as Slider from "@radix-ui/react-slider";
-import * as Tabs from "@radix-ui/react-tabs";
+import { vapi } from "../lib/vapi";
+import { INTERVIEWERS, resolveVoice } from "../hooks/useVapiInterview";
+
+const ROLE_LANGUAGES: Record<string, string[]> = {
+  frontend:  ["JavaScript", "TypeScript"],
+  backend:   ["Node.js", "Python", "Java"],
+  fullstack: ["JavaScript", "TypeScript"],
+  ml:        ["Python"],
+  mobile:    ["JavaScript", "TypeScript"],
+  devops:    ["Python", "Bash"],
+  security:  ["Python", "JavaScript"],
+  systems:   ["C++", "Python"],
+};
 
 const interviewerAvatars = [
   { name: "Cassidy", color: "from-purple-400 to-pink-400" },
   { name: "Alex", color: "from-blue-400 to-cyan-400" },
   { name: "Jordan", color: "from-green-400 to-emerald-400" },
 ];
+
+type InterviewerDisplay = {
+  style: string;
+  description: string;
+  traits: string[];
+  badgeClass: string;
+  accentClass: string;
+};
+
+const INTERVIEWER_DISPLAY: Record<string, InterviewerDisplay> = {
+  cassidy: {
+    style: "Conversational",
+    description:
+      "Builds rapport quickly and makes you feel at ease — then turns up the heat with pointed follow-ups. Warm and supportive on the surface, but won't let vague or weak answers slide.",
+    traits: ["Warm", "Encouraging", "Probing", "Personable"],
+    badgeClass: "bg-purple-100 text-purple-700",
+    accentClass: "text-purple-500",
+  },
+  alex: {
+    style: "Formal",
+    description:
+      "Direct, precise, and strictly technical. Expects structured thinking and concise answers. Has no patience for hand-waving — if your answer is incomplete, you'll hear about it.",
+    traits: ["Direct", "Precise", "Technical", "Demanding"],
+    badgeClass: "bg-blue-100 text-blue-700",
+    accentClass: "text-blue-500",
+  },
+  jordan: {
+    style: "Analytical",
+    description:
+      "Calm and methodical, with a deep curiosity about how you think. Asks things like \"walk me through your reasoning\" and \"what would change if the requirements shifted?\"",
+    traits: ["Curious", "Methodical", "Patient", "Thoughtful"],
+    badgeClass: "bg-green-100 text-green-700",
+    accentClass: "text-green-500",
+  },
+};
 
 export function SetupDashboard() {
   const navigate = useNavigate();
@@ -17,12 +65,98 @@ export function SetupDashboard() {
 
   const [role, setRole] = useState(roleParam);
   const [questionType, setQuestionType] = useState("behavioral");
+  const [language, setLanguage] = useState(() => ROLE_LANGUAGES[roleParam]?.[0] ?? "JavaScript");
   const [questionDifficulty, setQuestionDifficulty] = useState([50]);
   const [interviewerStrictness, setInterviewerStrictness] = useState([50]);
   const [experienceLevel, setExperienceLevel] = useState([2]);
   const [selectedInterviewer, setSelectedInterviewer] = useState(0);
+  const [previewingKey, setPreviewingKey] = useState<string | null>(null);
+  const previewCleanupRef = useRef<(() => void) | null>(null);
 
   const experienceLevels = ["Intern", "Entry", "Junior", "Senior"];
+
+  // Stop any active preview when this component unmounts
+  useEffect(() => () => { previewCleanupRef.current?.(); }, []);
+
+  // Reset language to the first option whenever role changes
+  useEffect(() => {
+    setLanguage(ROLE_LANGUAGES[role]?.[0] ?? "JavaScript");
+  }, [role]);
+
+  async function previewVoice(interviewerName: string) {
+    // Stop any currently playing preview before starting a new one
+    if (previewCleanupRef.current) {
+      previewCleanupRef.current();
+      await new Promise<void>((r) => setTimeout(r, 200));
+    }
+
+    const key = interviewerName.toLowerCase();
+    const interviewer = INTERVIEWERS[key] ?? INTERVIEWERS["cassidy"]!;
+    const resolvedVoice = resolveVoice(interviewer.voice);
+    const previewText = `Hi, I'm ${interviewer.name}. I'll be your interviewer today.`;
+
+    console.log("Previewing voice:", key);
+    setPreviewingKey(key);
+
+    let cleaned = false;
+    let safetyTimeout: ReturnType<typeof setTimeout>;
+
+    // Unified cleanup — idempotent, safe to call multiple times
+    const cleanup = () => {
+      if (cleaned) return;
+      cleaned = true;
+      clearTimeout(safetyTimeout);
+      vapi.removeListener("speech-end", onSpeechEnd);
+      vapi.removeListener("call-end", onCallEnd);
+      vapi.removeListener("error", onError);
+      setPreviewingKey(null);
+      previewCleanupRef.current = null;
+      vapi.stop();
+    };
+
+    // call-end fires after vapi.stop() — avoid calling stop() again from here
+    const onCallEnd = () => {
+      if (cleaned) return;
+      cleaned = true;
+      clearTimeout(safetyTimeout);
+      vapi.removeListener("speech-end", onSpeechEnd);
+      vapi.removeListener("error", onError);
+      setPreviewingKey(null);
+      previewCleanupRef.current = null;
+    };
+
+    const onSpeechEnd = () => cleanup();
+    const onError = (e: unknown) => {
+      console.error("Voice preview error:", e);
+      cleanup();
+    };
+
+    safetyTimeout = setTimeout(cleanup, 12000);
+    previewCleanupRef.current = cleanup;
+
+    vapi.on("speech-end", onSpeechEnd);
+    vapi.on("call-end", onCallEnd);
+    vapi.on("error", onError);
+
+    try {
+      const audioCtx = new AudioContext();
+      await audioCtx.resume();
+      await vapi.start({
+        model: {
+          provider: "openai",
+          model: "gpt-4o-mini",
+          messages: [{ role: "system", content: "You have just introduced yourself. Stay silent and wait — the user is only previewing your voice." }],
+        },
+        voice: resolvedVoice,
+        transcriber: { provider: "deepgram", model: "nova-3", language: "en" },
+        firstMessage: previewText,
+      } as Parameters<typeof vapi.start>[0]);
+    } catch (err) {
+      console.error("Voice preview failed:", err);
+      console.warn("Could not preview voice for:", key);
+      cleanup();
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-6">
@@ -84,6 +218,30 @@ export function SetupDashboard() {
                 ))}
               </div>
             </div>
+
+            {/* Language Selection — only shown for technical interviews */}
+            {questionType === "technical" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Language
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {(ROLE_LANGUAGES[role] ?? ["JavaScript"]).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setLanguage(lang)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        language === lang
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
+                          : "bg-white/60 text-gray-700 hover:bg-white/80"
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Question Difficulty */}
             <div>
@@ -183,7 +341,7 @@ export function SetupDashboard() {
               </h4>
 
               {/* Interviewer Selection */}
-              <div className="flex justify-center gap-3 mb-8">
+              <div className="flex justify-center gap-3 mb-5">
                 {interviewerAvatars.map((avatar, index) => (
                   <button
                     key={avatar.name}
@@ -197,35 +355,62 @@ export function SetupDashboard() {
                 ))}
               </div>
 
-              {/* Tabs */}
-              <Tabs.Root defaultValue="role" className="w-full">
-                <Tabs.List className="flex gap-2 mb-4">
-                  {["role", "qd", "id"].map((tab) => (
-                    <Tabs.Trigger
-                      key={tab}
-                      value={tab}
-                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all data-[state=active]:bg-white/80 data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 hover:bg-white/60"
-                    >
-                      {tab === "role" ? "Role" : tab === "qd" ? "QD" : "ID"}
-                    </Tabs.Trigger>
-                  ))}
-                </Tabs.List>
+              {/* Personality card — modelled after ElevenLabs / Vapi voice cards */}
+              {(() => {
+                const key = interviewerAvatars[selectedInterviewer]!.name.toLowerCase();
+                const display = INTERVIEWER_DISPLAY[key]!;
+                const isPreviewing = previewingKey === key;
+                return (
+                  <div className="rounded-xl bg-white/30 border border-white/50 overflow-hidden">
+                    {/* Card header */}
+                    <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/40">
+                      <span className={`text-xs font-semibold uppercase tracking-widest ${display.accentClass}`}>
+                        {display.style}
+                      </span>
+                      <div className="flex gap-1">
+                        {display.traits.map((trait) => (
+                          <span
+                            key={trait}
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${display.badgeClass}`}
+                          >
+                            {trait}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
 
-                <Tabs.Content value="role" className="text-sm text-gray-700">
-                  <p className="mb-2 font-medium">{role.charAt(0).toUpperCase() + role.slice(1)} Engineer</p>
-                  <p className="text-gray-600">Specialized in this role's common interview questions and scenarios.</p>
-                </Tabs.Content>
+                    {/* Description */}
+                    <p className="px-4 py-3 text-sm text-gray-600 leading-relaxed">
+                      {display.description}
+                    </p>
 
-                <Tabs.Content value="qd" className="text-sm text-gray-700">
-                  <p className="mb-2 font-medium">Question Difficulty: {questionDifficulty[0]}%</p>
-                  <p className="text-gray-600">Questions will be tailored to this difficulty level.</p>
-                </Tabs.Content>
-
-                <Tabs.Content value="id" className="text-sm text-gray-700">
-                  <p className="mb-2 font-medium">Interviewer Strictness: {interviewerStrictness[0]}%</p>
-                  <p className="text-gray-600">The interviewer will adjust their feedback style accordingly.</p>
-                </Tabs.Content>
-              </Tabs.Root>
+                    {/* Preview button — integrated at the card bottom like ElevenLabs */}
+                    <div className="px-4 pb-4">
+                      <button
+                        onClick={() => previewVoice(interviewerAvatars[selectedInterviewer]!.name)}
+                        disabled={isPreviewing}
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-all
+                          ${isPreviewing
+                            ? "bg-white/40 border-white/40 text-gray-400 cursor-not-allowed"
+                            : "bg-white/60 hover:bg-white/80 border-white/50 text-gray-700 shadow-sm"
+                          }`}
+                      >
+                        {isPreviewing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Playing sample…
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-4 h-4" />
+                            Preview voice
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Start Interview Button */}
@@ -233,15 +418,20 @@ export function SetupDashboard() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
+                // Stop any active voice preview before entering the interview
+                previewCleanupRef.current?.();
                 const isTechnical = questionType === "technical";
                 const route = isTechnical ? "/technical-interview" : "/interview/voice";
                 navigate(route, {
                   state: {
                     role,
                     questionType,
+                    language: questionType === "technical" ? language : undefined,
                     difficulty: questionDifficulty[0],
                     strictness: interviewerStrictness[0],
-                    experienceLevel: experienceLevel[0],
+                    // Normalize 0–3 index to 0–100 scale expected by both hooks
+                    // Intern→0, Entry→25, Junior→50, Senior→100
+                    experienceLevel: [0, 25, 50, 100][experienceLevel[0]] ?? 50,
                     interviewer: interviewerAvatars[selectedInterviewer]!.name,
                   },
                 });

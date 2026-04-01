@@ -46,10 +46,11 @@ export async function generateInterviewQuestions(
   role: string,
   difficulty: string,
   level: string,
+  language?: string,
 ): Promise<CodingProblem[]> {
   const res = await apiFetch("/analysis/questions", {
     method: "POST",
-    body: JSON.stringify({ role, difficulty, level }),
+    body: JSON.stringify({ role, difficulty, level, language }),
   });
   if (!res.ok) throw new Error("Failed to generate questions");
   const data = await res.json() as { problems: CodingProblem[] };
@@ -73,6 +74,31 @@ export async function getInterviewHistory(): Promise<SavedInterview[]> {
   if (!res.ok) throw new Error("Failed to fetch interview history");
   const data = await res.json();
   return data.interviews;
+}
+
+// ---- Replay API ----
+
+export interface ReplayInterview {
+  id: string;
+  role: string;
+  question_type: string;
+  date: string;
+  config?: VapiInterviewConfig;
+  result: VapiAnalysisResult;
+}
+
+export async function getInterviews(): Promise<ReplayInterview[]> {
+  const res = await apiFetch("/interviews");
+  if (!res.ok) throw new Error("Failed to fetch interviews");
+  const data = await res.json() as { interviews: ReplayInterview[] };
+  return data.interviews;
+}
+
+export async function getInterview(id: string): Promise<ReplayInterview> {
+  const res = await apiFetch(`/interviews/${id}`);
+  if (!res.ok) throw new Error("Failed to fetch interview");
+  const data = await res.json() as { interview: ReplayInterview };
+  return data.interview;
 }
 
 // ---- Text interview API ----

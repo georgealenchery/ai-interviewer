@@ -3,6 +3,7 @@ import { vapi } from "../lib/vapi";
 import { evaluateVapiInterview } from "../services/api";
 import type { VapiAnalysisResult } from "../services/api";
 import type { TranscriptMessage, CallStatus } from "./useVapiInterview";
+import { INTERVIEWERS, resolveVoice } from "./useVapiInterview";
 import type { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
 
 interface VapiTranscriptMessage {
@@ -25,6 +26,7 @@ export interface VapiTechnicalConfig {
   questionType: "behavioral" | "technical";
   questions: string[];
   level: string;
+  interviewer?: string;
 }
 
 function buildTechnicalSystemPrompt(config: VapiTechnicalConfig): string {
@@ -115,6 +117,7 @@ export function useVapiTechnicalInterview() {
   const [status, setStatus] = useState<CallStatus>("idle");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [messages, setMessages] = useState<TranscriptMessage[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [callEndedNaturally, setCallEndedNaturally] = useState(false);
@@ -125,6 +128,9 @@ export function useVapiTechnicalInterview() {
       console.log("Technical call started");
       setStatus("active");
       setIsListening(true);
+      setIsMuted(false);
+      vapi.setMuted(false);
+      console.log("Mic muted:", false);
     };
 
     const onCallEnd = () => {
@@ -211,16 +217,25 @@ export function useVapiTechnicalInterview() {
   const start = async (config: VapiTechnicalConfig) => {
     try {
       console.log("START technical interview — config:", config);
+      console.log("Interview type:", config.questionType);
       setStatus("connecting");
       setMessages([]);
       setCallEndedNaturally(false);
+      setIsMuted(false);
 
       const audioContext = new AudioContext();
       await audioContext.resume();
 
+      const interviewerKey = (config.interviewer ?? "cassidy").toLowerCase();
+      const interviewer = INTERVIEWERS[interviewerKey] ?? INTERVIEWERS["cassidy"]!;
+      const resolvedVoice = resolveVoice(interviewer.voice);
+      console.log("Using interviewer:", interviewerKey);
+      console.log("Resolved voice:", resolvedVoice);
+
       const systemPrompt = buildTechnicalSystemPrompt(config);
       const firstMessage = buildFirstMessage(config);
       console.log("Technical system prompt length:", systemPrompt.length);
+      console.log("Generated questions:", config.questions);
 
       const assistantConfig: CreateAssistantDTO = {
         model: {
@@ -228,8 +243,7 @@ export function useVapiTechnicalInterview() {
           model: "gpt-4.1",
           messages: [{ role: "system", content: systemPrompt }],
         },
-        // "Zac" is supported by Vapi but missing from the SDK type union
-        voice: { provider: "vapi", voiceId: "Zac", speed: 0.9 } as CreateAssistantDTO["voice"],
+        voice: resolvedVoice,
         transcriber: { provider: "deepgram", model: "nova-3", language: "en" },
         firstMessage,
         backgroundSpeechDenoisingPlan: {
@@ -243,22 +257,32 @@ export function useVapiTechnicalInterview() {
     }
   };
 
+  const toggleMute = () => {
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    vapi.setMuted(newMutedState);
+    console.log("Mic muted:", newMutedState);
+  };
+
   const stop = () => {
     vapi.stop();
     setStatus("ended");
     setIsSpeaking(false);
     setIsListening(false);
+    setIsMuted(false);
   };
 
   return {
     status,
     isSpeaking,
     isListening,
+    isMuted,
     messages,
     isAnalyzing,
     callEndedNaturally,
     start,
     stop,
+    toggleMute,
     evaluateTranscript,
   };
 }

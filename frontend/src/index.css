@@ -202,16 +202,41 @@
   background: #a5b4fc;
 }
 
-/* Monaco editor — override its internal scrollable element */
+/* Monaco editor — always lives inside dark UI, use dark scrollbar colors */
 .monaco-scrollable-element > .scrollbar > .slider {
-  background: #cbd5f5 !important;
+  background: #4b5563 !important;
   border-radius: 9999px !important;
 }
 
 .monaco-scrollable-element > .scrollbar > .slider:hover {
-  background: #a5b4fc !important;
+  background: #6b7280 !important;
 }
 
 .monaco-scrollable-element > .scrollbar {
-  background: #f3f4f6 !important;
+  background: #1f2937 !important;
+}
+
+/* ── Dark scrollbar variant — apply to dark-background containers ─────────── */
+
+.dark-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #1f2937;
+}
+
+.dark-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 9999px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }

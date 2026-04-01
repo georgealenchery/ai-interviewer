@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, History } from "lucide-react";
 import { useState, useEffect } from "react";
 import { DashboardNavbar } from "./DashboardNavbar";
 
@@ -104,6 +104,16 @@ export function HeroPage() {
                 Watch Demo
               </motion.button>
             </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/interviews")}
+              className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors w-fit"
+            >
+              <History className="h-4 w-4" />
+              View past interviews
+            </motion.button>
 
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-3">

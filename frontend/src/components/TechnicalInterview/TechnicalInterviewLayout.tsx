@@ -11,6 +11,12 @@ import type { VapiTechnicalConfig } from "../../hooks/useVapiTechnicalInterview"
 import { generateInterviewQuestions } from "../../services/api";
 import type { CodingProblem } from "../../services/api";
 
+const INTERVIEW_TIMER: Record<string, number> = {
+  easy:   1200, // 20 minutes
+  medium: 1500, // 25 minutes
+  hard:   1800, // 30 minutes
+};
+
 const FALLBACK_PROBLEMS: CodingProblem[] = [
   {
     prompt: "Write a function that takes an array of numbers and returns the two numbers that add up to the given target. Return them as an array in the order they appear.",
@@ -47,7 +53,6 @@ const FALLBACK_PROBLEMS: CodingProblem[] = [
 export function TechnicalInterviewLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [time, setTime] = useState(0);
   const [problems, setProblems] = useState<CodingProblem[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [questionsLoading, setQuestionsLoading] = useState(true);
@@ -58,17 +63,20 @@ export function TechnicalInterviewLayout() {
     status,
     isSpeaking,
     isListening,
+    isMuted,
     messages,
     isAnalyzing,
     callEndedNaturally,
     start,
     stop,
+    toggleMute,
     evaluateTranscript,
   } = useVapiTechnicalInterview();
 
   const state = location.state as {
     role?: string;
     questionType?: string;
+    language?: string;
     difficulty?: number;
     strictness?: number;
     experienceLevel?: number;
@@ -76,6 +84,8 @@ export function TechnicalInterviewLayout() {
   } | null;
 
   const role = state?.role ?? "frontend";
+  const language = state?.language ?? "JavaScript";
+  const interviewer = state?.interviewer;
   const difficultyValue = state?.difficulty ?? 50;
   const experienceLevelValue = state?.experienceLevel ?? 50;
 
@@ -83,10 +93,15 @@ export function TechnicalInterviewLayout() {
   const difficultyDisplay = difficultyLabel.charAt(0).toUpperCase() + difficultyLabel.slice(1);
   const level = experienceLevelValue <= 30 ? "junior" : experienceLevelValue <= 60 ? "mid" : "senior";
 
+  const totalTime = INTERVIEW_TIMER[difficultyLabel] ?? 1500;
+  const [timeLeft, setTimeLeft] = useState(totalTime);
+
   // Fetch AI-generated coding problems once on mount — do NOT regenerate mid-session
   useEffect(() => {
     setQuestionsLoading(true);
-    generateInterviewQuestions(role, difficultyLabel, level)
+    console.log("Role:", role);
+    console.log("Language:", language);
+    generateInterviewQuestions(role, difficultyLabel, level, language)
       .then((ps) => {
         console.log("Generated coding problems:", ps);
         setProblems(ps);
@@ -107,18 +122,28 @@ export function TechnicalInterviewLayout() {
     // Pass problem prompts as the voice questions so the interviewer reads them aloud
     questions: problems.map((p) => p.prompt),
     level,
+    interviewer,
   };
 
   const handleStart = () => {
     start(interviewConfig);
   };
 
-  // Timer — runs while call is active
+  // Countdown — ticks once per second while the call is active
   useEffect(() => {
-    if (status !== "active") return;
-    const timer = setInterval(() => setTime((t) => t + 1), 1000);
-    return () => clearInterval(timer);
-  }, [status]);
+    if (status !== "active" || timeLeft <= 0) return;
+    const timer = setTimeout(() => {
+      setTimeLeft((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft, status]);
+
+  // Auto-end the interview when the countdown expires
+  useEffect(() => {
+    if (timeLeft === 0 && status === "active") {
+      handleEnd();
+    }
+  }, [timeLeft]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const analyzeAndNavigate = async () => {
     const result = await evaluateTranscript(messages, interviewConfig);
@@ -176,11 +201,11 @@ export function TechnicalInterviewLayout() {
       <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col items-center justify-center">
         <div className="text-center max-w-md">
           <h1 className="text-2xl font-bold mb-2">Technical Interview</h1>
-          <p className="text-gray-400 mb-2 capitalize">{role} · {difficultyDisplay} · {level}</p>
+          <p className="text-gray-400 mb-2 capitalize">{role} · {difficultyDisplay} · {level} · {language}</p>
           <p className="text-sm text-gray-500 mb-8">
             {questionsLoading
               ? "Preparing your coding problems..."
-              : "You'll solve 3 coding problems. Write your solutions in the editor and pass all tests to advance. Your AI interviewer will guide you through each one."}
+              : `You'll solve 3 coding problems in ${totalTime / 60} minutes. Pass all tests to advance to the next problem. Your AI interviewer will guide you through each one.`}
           </p>
           {questionsLoading ? (
             <div className="w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto" />
@@ -222,7 +247,10 @@ export function TechnicalInterviewLayout() {
         level={level}
         questionNumber={currentQuestion + 1}
         totalQuestions={problems.length || 3}
-        time={time}
+        timeLeft={timeLeft}
+        totalTime={totalTime}
+        isMuted={isMuted}
+        onToggleMute={toggleMute}
         onEnd={handleEnd}
       />
 
@@ -254,6 +282,7 @@ export function TechnicalInterviewLayout() {
           <TechnicalCodeEditor
             problem={currentProblem}
             questionIndex={currentQuestion}
+            language={language}
             onAllTestsPassed={handleTestResults}
           />
         </div>

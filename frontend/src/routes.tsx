@@ -9,6 +9,8 @@ import { VapiInterviewPanel } from "./components/VapiInterviewPanel";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { SignupPage } from "./pages/SignupPage";
+import { InterviewsPage } from "./pages/InterviewsPage";
+import { InterviewReplayPage } from "./pages/InterviewReplayPage";
 
 export const router = createBrowserRouter([
   // Public routes
@@ -48,5 +50,13 @@ export const router = createBrowserRouter([
   {
     path: "/analytics",
     element: <ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>,
+  },
+  {
+    path: "/interviews",
+    element: <ProtectedRoute><InterviewsPage /></ProtectedRoute>,
+  },
+  {
+    path: "/interviews/:id",
+    element: <ProtectedRoute><InterviewReplayPage /></ProtectedRoute>,
   },
 ]);

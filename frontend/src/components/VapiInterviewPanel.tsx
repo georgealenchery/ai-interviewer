@@ -19,11 +19,13 @@ export function VapiInterviewPanel() {
     status,
     isSpeaking,
     isListening,
+    isMuted,
     messages,
     isAnalyzing,
     callEndedNaturally,
     start,
     stop,
+    toggleMute,
     evaluateTranscript,
   } = useVapiInterview();
 
@@ -219,7 +221,7 @@ export function VapiInterviewPanel() {
           className="backdrop-blur-lg bg-white/5 rounded-2xl p-6 border border-white/10 shadow-xl mb-6"
         >
           <h3 className="text-sm font-medium text-gray-400 mb-4">Live Transcript</h3>
-          <div className="space-y-4 max-h-64 overflow-y-auto flex flex-col-reverse">
+          <div className="dark-scrollbar space-y-4 max-h-64 overflow-y-auto flex flex-col-reverse">
             {messages.length === 0 && status !== "active" && (
               <p className="text-gray-500">Click Start to begin the interview…</p>
             )}
@@ -264,11 +266,11 @@ export function VapiInterviewPanel() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={stop}
+                onClick={toggleMute}
                 className="p-4 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all"
-                title="Mute / Stop"
+                title={isMuted ? "Unmute microphone" : "Mute microphone"}
               >
-                <MicOff className="w-6 h-6" />
+                {isMuted ? <MicOff className="w-6 h-6 text-red-400" /> : <Mic className="w-6 h-6" />}
               </motion.button>
 
               <motion.button

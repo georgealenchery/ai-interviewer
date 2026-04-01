@@ -46,6 +46,7 @@ export function DashboardNavbar({
   const navItems = [
     { label: "Dashboard", path: "/" },
     { label: "Practice Interviews", path: "/roles" },
+    { label: "Interviews", path: "/interviews" },
     { label: "Analytics", path: "/analytics" },
   ];
 
@@ -144,7 +145,7 @@ export function DashboardNavbar({
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        navigate("/analytics");
+                        navigate("/interviews");
                       }}
                       className="flex w-full items-center gap-3 px-4 py-3 text-gray-700 transition-all hover:bg-blue-50/50"
                     >

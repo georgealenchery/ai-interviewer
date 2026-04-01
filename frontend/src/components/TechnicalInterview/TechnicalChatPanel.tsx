@@ -56,7 +56,7 @@ export function TechnicalChatPanel({ messages, status, isSpeaking, isListening }
       </div>
 
       {/* Transcript */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
+      <div ref={scrollRef} className="dark-scrollbar flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
         {messages.length === 0 && status === "connecting" && (
           <p className="text-xs text-gray-500 animate-pulse">Connecting to interviewer...</p>
         )}

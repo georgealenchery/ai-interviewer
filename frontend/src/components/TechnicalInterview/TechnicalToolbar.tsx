@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { X } from "lucide-react";
+import { Mic, MicOff, X } from "lucide-react";
 
 type TechnicalToolbarProps = {
   role: string;
@@ -7,7 +7,10 @@ type TechnicalToolbarProps = {
   level: string;
   questionNumber: number;
   totalQuestions: number;
-  time: number;
+  timeLeft: number;
+  totalTime: number;
+  isMuted: boolean;
+  onToggleMute: () => void;
   onEnd: () => void;
 };
 
@@ -17,11 +20,20 @@ export function TechnicalToolbar({
   level,
   questionNumber,
   totalQuestions,
-  time,
+  timeLeft,
+  totalTime,
+  isMuted,
+  onToggleMute,
   onEnd,
 }: TechnicalToolbarProps) {
-  const mins = Math.floor(time / 60).toString().padStart(2, "0");
-  const secs = (time % 60).toString().padStart(2, "0");
+  const mins = Math.floor(timeLeft / 60).toString().padStart(2, "0");
+  const secs = (timeLeft % 60).toString().padStart(2, "0");
+
+  const pct = totalTime > 0 ? timeLeft / totalTime : 1;
+  const timerColor =
+    pct <= 0.1 ? "text-red-400" :
+    pct <= 0.3 ? "text-amber-400" :
+    "text-white";
 
   return (
     <div className="flex items-center justify-between mb-4">
@@ -35,9 +47,19 @@ export function TechnicalToolbar({
       </div>
 
       <div className="flex items-center gap-4">
-        <span className="text-2xl font-mono text-white tabular-nums">
+        <span className={`text-2xl font-mono tabular-nums transition-colors duration-500 ${timerColor}`}>
           {mins}:{secs}
         </span>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onToggleMute}
+          className="p-2 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all"
+          title={isMuted ? "Unmute microphone" : "Mute microphone"}
+        >
+          {isMuted ? <MicOff className="w-4 h-4 text-red-400" /> : <Mic className="w-4 h-4 text-white" />}
+        </motion.button>
 
         <motion.button
           whileHover={{ scale: 1.05 }}

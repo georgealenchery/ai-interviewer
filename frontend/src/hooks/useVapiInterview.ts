@@ -9,7 +9,7 @@ type ElevenLabsVoiceConfig = { provider: "11labs"; voiceId: string };
 type VapiVoiceConfig = { provider: "vapi"; voiceId: VapiVoice["voiceId"] };
 type VoiceConfig = ElevenLabsVoiceConfig | VapiVoiceConfig;
 
-function resolveVoice(voice: VoiceConfig): ElevenLabsVoice | VapiVoice {
+export function resolveVoice(voice: VoiceConfig): ElevenLabsVoice | VapiVoice {
   if (voice.provider === "11labs") {
     return { provider: "11labs", voiceId: voice.voiceId };
   }
@@ -219,6 +219,7 @@ export function useVapiInterview() {
   const [status, setStatus] = useState<CallStatus>("idle");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [messages, setMessages] = useState<TranscriptMessage[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [callEndedNaturally, setCallEndedNaturally] = useState(false);
@@ -229,6 +230,9 @@ export function useVapiInterview() {
       console.log("Call started");
       setStatus("active");
       setIsListening(true);
+      setIsMuted(false);
+      vapi.setMuted(false);
+      console.log("Mic muted:", false);
     };
 
     const onCallEnd = () => {
@@ -314,6 +318,7 @@ export function useVapiInterview() {
       setStatus("connecting");
       setMessages([]);
       setCallEndedNaturally(false);
+      setIsMuted(false);
 
       // Unlock audio output (must happen in user-gesture handler)
       const audioContext = new AudioContext();
@@ -352,22 +357,32 @@ export function useVapiInterview() {
     }
   };
 
+  const toggleMute = () => {
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    vapi.setMuted(newMutedState);
+    console.log("Mic muted:", newMutedState);
+  };
+
   const stop = () => {
     vapi.stop();
     setStatus("ended");
     setIsSpeaking(false);
     setIsListening(false);
+    setIsMuted(false);
   };
 
   return {
     status,
     isSpeaking,
     isListening,
+    isMuted,
     messages,
     isAnalyzing,
     callEndedNaturally,
     start,
     stop,
+    toggleMute,
     evaluateTranscript,
   };
 }
