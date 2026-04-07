@@ -79,6 +79,22 @@ export async function signup(email: string, password: string, name?: string): Pr
   return user;
 }
 
+export async function signInWithGoogle(): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin },
+  });
+  if (error) throw new Error(error.message);
+}
+
+export async function signInWithGitHub(): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "github",
+    options: { redirectTo: window.location.origin },
+  });
+  if (error) throw new Error(error.message);
+}
+
 export function logout(): void {
   supabase.auth.signOut().then(() => {
     _cachedUser = null;

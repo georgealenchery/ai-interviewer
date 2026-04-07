@@ -23,7 +23,11 @@
       "Bash(echo \"EXIT:$?\")",
       "Bash(echo \"FE_EXIT:$?\")",
       "Bash(echo \"BE_EXIT:$?\")",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(npx playwright:*)",
+      "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+      "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+      "mcp__plugin_context-mode_context-mode__ctx_execute"
     ]
   },
   "enabledPlugins": {

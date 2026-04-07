@@ -4,7 +4,16 @@ import { authMiddleware } from "../middleware/auth";
 import { supabase } from "../services/supabase";
 
 const router = Router();
-const VALID_ROLES = new Set(["frontend", "backend", "fullstack"]);
+const VALID_ROLES = new Set([
+  "frontend",
+  "backend",
+  "fullstack",
+  "ml",
+  "mobile",
+  "devops",
+  "security",
+  "systems",
+]);
 
 // GET /api/auth/me
 router.get("/me", authMiddleware, async (req: Request, res: Response) => {

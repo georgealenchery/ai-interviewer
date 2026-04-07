@@ -5,7 +5,18 @@ const router = Router();
 
 // POST /api/vapi/webhook — receive Vapi event payloads
 router.post("/webhook", (req: Request, res: Response) => {
-  console.log("[Vapi webhook]", JSON.stringify(req.body, null, 2));
+  const body = req.body;
+
+  // Basic structural validation — reject payloads without expected Vapi fields
+  if (!body || typeof body !== "object") {
+    res.status(400).json({ error: "Invalid webhook payload" });
+    return;
+  }
+
+  // Log only the event type, not full payload (avoid leaking transcript data to logs)
+  const eventType = body.message?.type ?? body.type ?? "unknown";
+  console.log(`[Vapi webhook] event=${eventType}`);
+
   res.json({ ok: true });
 });
 

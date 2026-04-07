@@ -3,11 +3,12 @@ import type { Request, Response } from "express";
 import { analyzeVapiTranscript, generateInterviewQuestions } from "../services/aiService";
 import { saveInterview, getInterviews } from "../services/storageService";
 import type { VapiTranscriptEntry, VapiInterviewConfig } from "../types/interview";
+import { validateQuestionGeneration, validateTranscriptEvaluation } from "../middleware/validate";
 
 const router = Router();
 
 // POST /api/analysis/questions — generate 3 role-aware technical questions
-router.post("/questions", async (req: Request, res: Response) => {
+router.post("/questions", validateQuestionGeneration, async (req: Request, res: Response) => {
   try {
     const { role, difficulty, level, language } = req.body as {
       role: string;
@@ -15,10 +16,6 @@ router.post("/questions", async (req: Request, res: Response) => {
       level: string;
       language?: string;
     };
-
-    if (!role || !difficulty || !level) {
-      return res.status(400).json({ error: "Missing required fields: role, difficulty, level" });
-    }
 
     const problems = await generateInterviewQuestions(role, difficulty, level, language);
     res.json({ problems });
@@ -29,20 +26,12 @@ router.post("/questions", async (req: Request, res: Response) => {
 });
 
 // POST /api/analysis/evaluate — analyze a completed voice interview
-router.post("/evaluate", async (req: Request, res: Response) => {
+router.post("/evaluate", validateTranscriptEvaluation, async (req: Request, res: Response) => {
   try {
     const { transcript, config } = req.body as {
       transcript: VapiTranscriptEntry[];
       config: VapiInterviewConfig;
     };
-
-    if (!transcript || !Array.isArray(transcript) || transcript.length === 0) {
-      return res.status(400).json({ error: "Missing or empty transcript" });
-    }
-
-    if (!config || !config.role || !config.questionType) {
-      return res.status(400).json({ error: "Missing required config fields: role, questionType" });
-    }
 
     // Strip timestamps for AI analysis; pass full entries (with timestamps) to storage
     const analysisTranscript = transcript.map(({ role, text }) => ({ role, text }));
